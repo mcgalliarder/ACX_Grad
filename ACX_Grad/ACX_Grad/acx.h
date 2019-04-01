@@ -2,7 +2,8 @@
  * acx.h
  *
  * Created: 3/26/2019
- * Author: Andrew Thorp
+ * Author: Andrew Thorp thorpah
+ * Author: Eli McGalliard mcgalliarder
  * 
  *       **************************************************
  *       **************************************************
