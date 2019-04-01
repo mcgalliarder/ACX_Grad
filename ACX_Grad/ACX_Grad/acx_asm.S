@@ -11,8 +11,10 @@
  #include <avr/io.h>
  #include "acx.h"
 
-
 		.section .text
+
+
+//lookup: .db 1, 2, 4, 8, 16, 32, 64, 128
 		
 		.global x_yield
 x_yield:
@@ -65,15 +67,15 @@ restore:
 		.global bit2mask8
 bit2mask8:
 		;r24 contains thread ID input
-		cp r24, 0
-		brlo none
-		cp 8, r24
-		brge none
+		//cp 0, r24
+		//brlo none
+		//cp r24, 8
+		//brge none
 		ldi r25, 1
 again:
 
 		dec r24
-		cp 0, r24
+		cpi r24, 1
 		brlo done
 		lsl r25
 		jmp again
@@ -87,46 +89,5 @@ none:
 		ldi r24, 0	
 finished:
 		ret
-/*
-		cp r24, 0
-		brne one
-		ldi r24, 1
-		jmp done
-one:
-		cp r24, 1
-		brne two
-		ldi r24, 2
-		jmp done
-two:
-		cp r24, 2
-		brne three
-		ldi r24, 4
-		jmp done
-three:
-		cp r24, 3
-		brne four
-		ldi r24, 8
-		jmp done
-four:
-		cp r24, 4
-		brne five
-		ldi r24, 16
-		jmp done
-five:
-		cp r24, 5
-		brne six
-		ldi r24, 32
-		jmp done
-six:
-		cp r24, 6
-		brne seven
-		ldi r24, 64
-		jmp done
-seven:
-		cp r24, 7
-		brne none
-		ldi r24, 128
-		jmp done
-none:
-		ldi r24, 0
-*/
+
+
