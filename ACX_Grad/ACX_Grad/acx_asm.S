@@ -11,8 +11,10 @@
  #include <avr/io.h>
  #include "acx.h"
 
-
 		.section .text
+
+
+//lookup: .db 1, 2, 4, 8, 16, 32, 64, 128
 		
 		.global x_yield
 x_yield:
@@ -71,11 +73,12 @@ bit2mask8:
 		brlo none
 		cp 8, r24
 		brge none
+
 		ldi r25, 1
 again:
 
 		dec r24
-		cp 0, r24
+		cpi r24, 1
 		brlo done
 		lsl r25
 		jmp again
@@ -89,3 +92,4 @@ none:
 		ldi r24, 0	
 finished:
 		ret
+
