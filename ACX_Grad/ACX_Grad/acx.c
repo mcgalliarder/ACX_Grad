@@ -13,6 +13,24 @@
 #include <stdbool.h>
 #include "acx.h"
 
+
+byte disable;
+byte suspend;
+byte delay;
+unsigned int delayCounters[MAX_DELAY];
+byte x_thread_id;
+byte x_thread_mask;
+byte mem[STACK_MEM_SIZE];
+
+stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS + (int) mem},
+											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS + (int) mem},
+											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS + (int) mem},
+											   {T3_STACK_BASE_OFFS + (int) mem, T3_STACK_BASE_OFFS + (int) mem},
+											   {T4_STACK_BASE_OFFS + (int) mem, T4_STACK_BASE_OFFS + (int) mem},
+											   {T5_STACK_BASE_OFFS + (int) mem, T5_STACK_BASE_OFFS + (int) mem},
+											   {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS + (int) mem},
+											   {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS + (int) mem}};
+
 //---------------------------------------------------
 // Initialize all kernal state variables
 //---------------------------------------------------
@@ -27,15 +45,6 @@ void kernalInit(void) {
 
     x_thread_id = 0; // current thread
     x_thread_mask = 0x01;
-
-    stackControlTable = {{T0_STACK_BASE_OFFS + mem, T0_STACK_BASE_OFFS + mem},
-                         {T1_STACK_BASE_OFFS + mem, T1_STACK_BASE_OFFS + mem},
-                         {T2_STACK_BASE_OFFS + mem, T2_STACK_BASE_OFFS + mem},
-                         {T3_STACK_BASE_OFFS + mem, T3_STACK_BASE_OFFS + mem},
-                         {T4_STACK_BASE_OFFS + mem, T4_STACK_BASE_OFFS + mem},
-                         {T5_STACK_BASE_OFFS + mem, T5_STACK_BASE_OFFS + mem},
-                         {T6_STACK_BASE_OFFS + mem, T6_STACK_BASE_OFFS + mem},
-                         {T7_STACK_BASE_OFFS + mem, T7_STACK_BASE_OFFS + mem}};
 }
 
 //---------------------------------------------------

@@ -38,6 +38,7 @@ x_yield:
 
 	; save stack pointer in appropriate array location
     ;---------------------------
+	;in r24, __SP
 
  	lds r30, x_thread_id        ; get stack ID
  	ldi r31, 0
@@ -49,8 +50,13 @@ x_yield:
  	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
  	subi r31, hi8(-(stackControlTable))
 
-    st Z, SP                            ; store stack pointer in stackControlTable
- 	
+	movw X, SP
+	
+
+
+    st Z, X					; store stack pointer in stackControlTable
+ 	;st r31,	hi8(SP)
+
 	; Check for stack overflows
     ;---------------------------
 
