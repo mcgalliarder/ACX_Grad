@@ -17,28 +17,12 @@ int main(void)
 {
     DDRB |= 0x80;
 
-    PSerial_open(0, BAUD115200, SERIAL_8N1);
-	
-	int i;
-	
-	for (int j = 0; j < SP; j++) {
-		i = (int) SP;
-	}
-	
-	/*
-    x_init();
+    //PSerial_open(0, BAUD115200, SERIAL_8N1);
 
-    _delay_ms(5000);
-    PSprintf(0, "T0 Stack pointer: %X\n\r", mem + T0_STACK_BASE_OFFS);
-    _delay_ms(1000);
-    */
+	x_init();
+	
     while (1) {
-		/*
-        PSprintf(0, "Stack: %X\n\r", SP);
-        asm("push 0x1");
-        PORTB ^= 0x80;
-        _delay_ms(100);
-		*/
+		
 
 		x_yield();
 

@@ -5,6 +5,21 @@
  *  Created: 3/28/2019
  *  Author: Andrew Thorp thorpah
  *  Author: Eli McGalliard mcgalliarder 
+ *
+ *
+ *       **************************************************
+ *       **************************************************
+ *       **     _   _   _                _______   __    **
+ *       **    | | (_) | |         /\   / ____\ \ / /    **
+ *       **    | |  _  | |__      /  \ | |     \ V /     **
+ *       **    | | | | | '_ \    / /\ \| |      > <      **
+ *       **    | | | | | |_) |  / ____ \ |____ / . \     **
+ *       **    |_| |_| |_.__/  /_/    \_\_____/_/ \_\    **
+ *       **                                              **
+ *       **                                 Andrew Thorp **
+ *       **                               Eli McGalliard **
+ *       **************************************************
+ *       **************************************************
  */
 
  #define __SFR_OFFSET 0
@@ -54,20 +69,35 @@ x_yield:
  	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
  	subi r31, hi8(-(stackControlTable))
 
-	in r24, __SP_L__
-	in r25, __SP_H__
+	in	r24, __SP_L__			; Put SP in r24-25
+	in	r25, __SP_H__
 
-	st Z+ , r24
-	st Z , r25
+	st	Z+,	r24					; *Z = SP 
+	st	Z , r25
 
 
 	; Check for stack overflows
     ;---------------------------
-
-
  	
- 	ldi r30, lo8(mem)           ; Init Z pointer to &mem
+ 	; int * Z = mem
+	ldi r30, lo8(mem)           ; Init Z pointer to &mem
  	ldi r31, hi8(mem)
+
+	; int offset = x_thread_id * 256
+	ldi r24, 0
+	lds r25,	x_thread_id
+
+	add r31,	r25;
+	ld	r24,	Z
+
+	cpi	r24,	0xAA
+	breq noSOF
+SOF:
+	; Execute if there is a stack overflow
+	ldi r24,	0xAA
+	st	Z,		r24	; replace mutated canary
+noSOF:
+	; No stack overflow
  	
  	
 	; Determine next thread to run
