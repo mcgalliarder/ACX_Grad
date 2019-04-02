@@ -41,10 +41,14 @@ x_yield:
 	push r17
 
 	; save stack pointer in appropriate array location
-
+ 	ldi r16, getTID()
 	; Check for stack overflows
-
+ 	mov r20, r16 
+ 	mul r20, T0_STACK_SIZE
+ 	ldi r30, lo8(mem)
+ 	ldi r31, hi8(mem)
 	; Determine next thread to run
+ 	; threadID * stacksize for canary
 
 	; Retrieve next stack pointer for next thread
 
@@ -113,10 +117,13 @@ bit2mask8:
 		;r24 contains thread ID input
 		cpi r24, 1
 		brlo none
+		/*
 		cp 8, r24
 		brge none
 
 		ldi r25, 1
+		*/
+ 		adc r24, 1
 again:
 
 		dec r24
