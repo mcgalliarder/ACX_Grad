@@ -60,11 +60,6 @@ x_yield:
 	st Z+ , r24
 	st Z , r25
 
-	
-
-
-;    st Z, X					; store stack pointer in stackControlTable
- 	;st r31,	hi8(SP)
 
 	; Check for stack overflows
     ;---------------------------
