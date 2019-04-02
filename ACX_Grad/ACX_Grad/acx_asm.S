@@ -57,7 +57,8 @@ x_yield:
 	in r24, __SP_L__
 	in r25, __SP_H__
 
-	st Z , r24
+	st Z+ , r24
+	st Z , r25
 
 	
 

@@ -3,31 +3,31 @@ ACX_Grad.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000020  00800200  000002ba  0000034e  2**0
+  0 .data         00000020  00800200  000002bc  00000350  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         000002ba  00000000  00000000  00000094  2**1
+  1 .text         000002bc  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00001005  00800220  00800220  0000036e  2**0
+  2 .bss          00001005  00800220  00800220  00000370  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  0000036e  2**0
+  3 .comment      00000030  00000000  00000000  00000370  2**0
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  000003a0  2**2
                   CONTENTS, READONLY
   5 .debug_aranges 00000100  00000000  00000000  000003e0  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000013f4  00000000  00000000  000004e0  2**0
+  6 .debug_info   000013f6  00000000  00000000  000004e0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000e99  00000000  00000000  000018d4  2**0
+  7 .debug_abbrev 00000e99  00000000  00000000  000018d6  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000add  00000000  00000000  0000276d  2**0
+  8 .debug_line   00000ae3  00000000  00000000  0000276f  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000018c  00000000  00000000  0000324c  2**2
+  9 .debug_frame  0000018c  00000000  00000000  00003254  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000723  00000000  00000000  000033d8  2**0
+ 10 .debug_str    00000723  00000000  00000000  000033e0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000006d2  00000000  00000000  00003afb  2**0
+ 11 .debug_loc    000006d2  00000000  00000000  00003b03  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000b0  00000000  00000000  000041cd  2**0
+ 12 .debug_ranges 000000b0  00000000  00000000  000041d5  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -162,7 +162,7 @@ Disassembly of section .text:
   f4:	12 e0       	ldi	r17, 0x02	; 2
   f6:	a0 e0       	ldi	r26, 0x00	; 0
   f8:	b2 e0       	ldi	r27, 0x02	; 2
-  fa:	ea eb       	ldi	r30, 0xBA	; 186
+  fa:	ec eb       	ldi	r30, 0xBC	; 188
   fc:	f2 e0       	ldi	r31, 0x02	; 2
   fe:	00 e0       	ldi	r16, 0x00	; 0
  100:	0b bf       	out	0x3b, r16	; 59
@@ -186,8 +186,8 @@ Disassembly of section .text:
  118:	a5 32       	cpi	r26, 0x25	; 37
  11a:	b2 07       	cpc	r27, r18
  11c:	e1 f7       	brne	.-8      	; 0x116 <.do_clear_bss_loop>
- 11e:	42 d0       	rcall	.+132    	; 0x1a4 <main>
- 120:	ca c0       	rjmp	.+404    	; 0x2b6 <_exit>
+ 11e:	43 d0       	rcall	.+134    	; 0x1a6 <main>
+ 120:	cb c0       	rjmp	.+406    	; 0x2b8 <_exit>
 
 00000122 <__bad_interrupt>:
  122:	6e cf       	rjmp	.-292    	; 0x0 <__vectors>
@@ -258,280 +258,257 @@ Disassembly of section .text:
 	in r25, __SP_H__
  158:	9d b7       	in	r25, 0x3d	; 61
 
-	st Z , r24
- 15a:	80 83       	st	Z, r24
+	st Z+ , r24
+ 15a:	81 93       	st	Z+, r24
+	st Z , r25
+ 15c:	90 83       	st	Z, r25
 	; Check for stack overflows
     ;---------------------------
 
 
  	
  	ldi r30, lo8(mem)           ; Init Z pointer to &mem
- 15c:	e3 e2       	ldi	r30, 0x23	; 35
+ 15e:	e3 e2       	ldi	r30, 0x23	; 35
  	ldi r31, hi8(mem)
- 15e:	fa e0       	ldi	r31, 0x0A	; 10
+ 160:	fa e0       	ldi	r31, 0x0A	; 10
 	; Retrieve next stack pointer for next thread
     ;---------------------------
 
     ; restore new thread's stack pointer
     ;---------------------------
     cli             ; begin stack pointer change
- 160:	f8 94       	cli
+ 162:	f8 94       	cli
         ; do stack pointer change here
     sei             ; end  stack pointer change
- 162:	78 94       	sei
+ 164:	78 94       	sei
 
 
     ; restore new thread's registers 
     ;---------------------------
 	pop r17
- 164:	1f 91       	pop	r17
+ 166:	1f 91       	pop	r17
 	pop r16
- 166:	0f 91       	pop	r16
+ 168:	0f 91       	pop	r16
 	pop r15
- 168:	ff 90       	pop	r15
+ 16a:	ff 90       	pop	r15
 	pop r14
- 16a:	ef 90       	pop	r14
+ 16c:	ef 90       	pop	r14
 	pop r13
- 16c:	df 90       	pop	r13
+ 16e:	df 90       	pop	r13
 	pop r12
- 16e:	cf 90       	pop	r12
+ 170:	cf 90       	pop	r12
 	pop r11
- 170:	bf 90       	pop	r11
+ 172:	bf 90       	pop	r11
 	pop r10
- 172:	af 90       	pop	r10
+ 174:	af 90       	pop	r10
 	pop r9
- 174:	9f 90       	pop	r9
+ 176:	9f 90       	pop	r9
 	pop r8
- 176:	8f 90       	pop	r8
+ 178:	8f 90       	pop	r8
 	pop r7
- 178:	7f 90       	pop	r7
+ 17a:	7f 90       	pop	r7
 	pop r6
- 17a:	6f 90       	pop	r6
+ 17c:	6f 90       	pop	r6
 	pop r5
- 17c:	5f 90       	pop	r5
+ 17e:	5f 90       	pop	r5
 	pop r4
- 17e:	4f 90       	pop	r4
+ 180:	4f 90       	pop	r4
 	pop r3
- 180:	3f 90       	pop	r3
+ 182:	3f 90       	pop	r3
 	pop r2
- 182:	2f 90       	pop	r2
+ 184:	2f 90       	pop	r2
 
 	ret
- 184:	08 95       	ret
+ 186:	08 95       	ret
 
-00000186 <x_schedule>:
+00000188 <x_schedule>:
 
 ; your code here
 
 
 	// Return to next thread
 		ret
- 186:	08 95       	ret
+ 188:	08 95       	ret
 
-00000188 <bit2mask8>:
+0000018a <bit2mask8>:
 
 		.global bit2mask8
 bit2mask8:
 
 		;r24 contains thread ID input
 		cpi r24, 1
- 188:	81 30       	cpi	r24, 0x01	; 1
+ 18a:	81 30       	cpi	r24, 0x01	; 1
 		brlo none
- 18a:	48 f0       	brcs	.+18     	; 0x19e <none>
+ 18c:	48 f0       	brcs	.+18     	; 0x1a0 <none>
 		cp 8, r24
 		brge none
 
 		ldi r25, 1
 		*/
  		adc r24, 1
- 18c:	81 1d       	adc	r24, r1
+ 18e:	81 1d       	adc	r24, r1
 
-0000018e <again>:
+00000190 <again>:
 again:
 
 		dec r24
- 18e:	8a 95       	dec	r24
+ 190:	8a 95       	dec	r24
 		cpi r24, 1
- 190:	81 30       	cpi	r24, 0x01	; 1
+ 192:	81 30       	cpi	r24, 0x01	; 1
 		brlo done
- 192:	10 f0       	brcs	.+4      	; 0x198 <done>
+ 194:	10 f0       	brcs	.+4      	; 0x19a <done>
 		lsl r25
- 194:	99 0f       	add	r25, r25
+ 196:	99 0f       	add	r25, r25
 		jmp again
- 196:	fb cf       	rjmp	.-10     	; 0x18e <again>
+ 198:	fb cf       	rjmp	.-10     	; 0x190 <again>
 
-00000198 <done>:
+0000019a <done>:
 
 done:	mov r24, r25
- 198:	89 2f       	mov	r24, r25
+ 19a:	89 2f       	mov	r24, r25
 		ldi r25, 0
 		jmp finished
- 19a:	90 e0       	ldi	r25, 0x00	; 0
- 19c:	02 c0       	rjmp	.+4      	; 0x1a2 <finished>
+ 19c:	90 e0       	ldi	r25, 0x00	; 0
+ 19e:	02 c0       	rjmp	.+4      	; 0x1a4 <finished>
 
-0000019e <none>:
+000001a0 <none>:
 
 none:
 		ldi r25, 0
- 19e:	90 e0       	ldi	r25, 0x00	; 0
+ 1a0:	90 e0       	ldi	r25, 0x00	; 0
 		ldi r24, 0	
- 1a0:	80 e0       	ldi	r24, 0x00	; 0
+ 1a2:	80 e0       	ldi	r24, 0x00	; 0
 
-000001a2 <finished>:
+000001a4 <finished>:
 finished:
 		ret
- 1a2:	08 95       	ret
+ 1a4:	08 95       	ret
 
-000001a4 <main>:
-#include "PSerial.h"
-#include "acx.h"
+000001a6 <main>:
+ 1a6:	27 9a       	sbi	0x04, 7	; 4
+ 1a8:	26 e0       	ldi	r18, 0x06	; 6
+ 1aa:	30 e0       	ldi	r19, 0x00	; 0
+ 1ac:	48 e0       	ldi	r20, 0x08	; 8
+ 1ae:	50 e0       	ldi	r21, 0x00	; 0
+ 1b0:	60 e0       	ldi	r22, 0x00	; 0
+ 1b2:	70 e0       	ldi	r23, 0x00	; 0
+ 1b4:	80 e0       	ldi	r24, 0x00	; 0
+ 1b6:	47 d0       	rcall	.+142    	; 0x246 <PSerial_open>
+ 1b8:	8d b7       	in	r24, 0x3d	; 61
+ 1ba:	9e b7       	in	r25, 0x3e	; 62
+ 1bc:	89 2b       	or	r24, r25
+ 1be:	51 f0       	breq	.+20     	; 0x1d4 <main+0x2e>
+ 1c0:	80 e0       	ldi	r24, 0x00	; 0
+ 1c2:	90 e0       	ldi	r25, 0x00	; 0
+ 1c4:	2d b7       	in	r18, 0x3d	; 61
+ 1c6:	3e b7       	in	r19, 0x3e	; 62
+ 1c8:	01 96       	adiw	r24, 0x01	; 1
+ 1ca:	2d b7       	in	r18, 0x3d	; 61
+ 1cc:	3e b7       	in	r19, 0x3e	; 62
+ 1ce:	82 17       	cp	r24, r18
+ 1d0:	93 07       	cpc	r25, r19
+ 1d2:	c0 f3       	brcs	.-16     	; 0x1c4 <main+0x1e>
+ 1d4:	a7 df       	rcall	.-178    	; 0x124 <x_yield>
+ 1d6:	fe cf       	rjmp	.-4      	; 0x1d4 <main+0x2e>
 
-int main(void)
-{
-    DDRB |= 0x80;
- 1a4:	27 9a       	sbi	0x04, 7	; 4
+000001d8 <PSerial_read>:
+ 1d8:	81 30       	cpi	r24, 0x01	; 1
+ 1da:	71 f0       	breq	.+28     	; 0x1f8 <PSerial_read+0x20>
+ 1dc:	28 f0       	brcs	.+10     	; 0x1e8 <PSerial_read+0x10>
+ 1de:	82 30       	cpi	r24, 0x02	; 2
+ 1e0:	99 f0       	breq	.+38     	; 0x208 <PSerial_read+0x30>
+ 1e2:	83 30       	cpi	r24, 0x03	; 3
+ 1e4:	c9 f0       	breq	.+50     	; 0x218 <PSerial_read+0x40>
+ 1e6:	20 c0       	rjmp	.+64     	; 0x228 <PSerial_read+0x50>
+ 1e8:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
+ 1ec:	88 23       	and	r24, r24
+ 1ee:	fc f4       	brge	.+62     	; 0x22e <PSerial_read+0x56>
+ 1f0:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7000c6>
+ 1f4:	90 e0       	ldi	r25, 0x00	; 0
+ 1f6:	08 95       	ret
+ 1f8:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
+ 1fc:	88 23       	and	r24, r24
+ 1fe:	d4 f4       	brge	.+52     	; 0x234 <PSerial_read+0x5c>
+ 200:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7000ce>
+ 204:	90 e0       	ldi	r25, 0x00	; 0
+ 206:	08 95       	ret
+ 208:	80 91 d0 00 	lds	r24, 0x00D0	; 0x8000d0 <__TEXT_REGION_LENGTH__+0x7000d0>
+ 20c:	88 23       	and	r24, r24
+ 20e:	ac f4       	brge	.+42     	; 0x23a <PSerial_read+0x62>
+ 210:	80 91 d6 00 	lds	r24, 0x00D6	; 0x8000d6 <__TEXT_REGION_LENGTH__+0x7000d6>
+ 214:	90 e0       	ldi	r25, 0x00	; 0
+ 216:	08 95       	ret
+ 218:	80 91 30 01 	lds	r24, 0x0130	; 0x800130 <__TEXT_REGION_LENGTH__+0x700130>
+ 21c:	88 23       	and	r24, r24
+ 21e:	84 f4       	brge	.+32     	; 0x240 <PSerial_read+0x68>
+ 220:	80 91 36 01 	lds	r24, 0x0136	; 0x800136 <__TEXT_REGION_LENGTH__+0x700136>
+ 224:	90 e0       	ldi	r25, 0x00	; 0
+ 226:	08 95       	ret
+ 228:	8f ef       	ldi	r24, 0xFF	; 255
+ 22a:	9f ef       	ldi	r25, 0xFF	; 255
+ 22c:	08 95       	ret
+ 22e:	8f ef       	ldi	r24, 0xFF	; 255
+ 230:	9f ef       	ldi	r25, 0xFF	; 255
+ 232:	08 95       	ret
+ 234:	8f ef       	ldi	r24, 0xFF	; 255
+ 236:	9f ef       	ldi	r25, 0xFF	; 255
+ 238:	08 95       	ret
+ 23a:	8f ef       	ldi	r24, 0xFF	; 255
+ 23c:	9f ef       	ldi	r25, 0xFF	; 255
+ 23e:	08 95       	ret
+ 240:	8f ef       	ldi	r24, 0xFF	; 255
+ 242:	9f ef       	ldi	r25, 0xFF	; 255
+ 244:	08 95       	ret
 
-    PSerial_open(0, BAUD115200, SERIAL_8N1);
- 1a6:	26 e0       	ldi	r18, 0x06	; 6
- 1a8:	30 e0       	ldi	r19, 0x00	; 0
- 1aa:	48 e0       	ldi	r20, 0x08	; 8
- 1ac:	50 e0       	ldi	r21, 0x00	; 0
- 1ae:	60 e0       	ldi	r22, 0x00	; 0
- 1b0:	70 e0       	ldi	r23, 0x00	; 0
- 1b2:	80 e0       	ldi	r24, 0x00	; 0
- 1b4:	47 d0       	rcall	.+142    	; 0x244 <PSerial_open>
-	
-	int i;
-	
-	for (int j = 0; j < SP; j++) {
- 1b6:	8d b7       	in	r24, 0x3d	; 61
- 1b8:	9e b7       	in	r25, 0x3e	; 62
- 1ba:	89 2b       	or	r24, r25
- 1bc:	51 f0       	breq	.+20     	; 0x1d2 <main+0x2e>
- 1be:	80 e0       	ldi	r24, 0x00	; 0
- 1c0:	90 e0       	ldi	r25, 0x00	; 0
-		i = (int) SP;
- 1c2:	2d b7       	in	r18, 0x3d	; 61
- 1c4:	3e b7       	in	r19, 0x3e	; 62
+00000246 <PSerial_open>:
+ 246:	81 30       	cpi	r24, 0x01	; 1
+ 248:	91 f0       	breq	.+36     	; 0x26e <PSerial_open+0x28>
+ 24a:	28 f0       	brcs	.+10     	; 0x256 <PSerial_open+0x10>
+ 24c:	82 30       	cpi	r24, 0x02	; 2
+ 24e:	d9 f0       	breq	.+54     	; 0x286 <PSerial_open+0x40>
+ 250:	83 30       	cpi	r24, 0x03	; 3
+ 252:	29 f1       	breq	.+74     	; 0x29e <PSerial_open+0x58>
+ 254:	2f c0       	rjmp	.+94     	; 0x2b4 <PSerial_open+0x6e>
+ 256:	e1 ec       	ldi	r30, 0xC1	; 193
+ 258:	f0 e0       	ldi	r31, 0x00	; 0
+ 25a:	90 81       	ld	r25, Z
+ 25c:	98 61       	ori	r25, 0x18	; 24
+ 25e:	90 83       	st	Z, r25
+ 260:	20 93 c2 00 	sts	0x00C2, r18	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7000c2>
+ 264:	50 93 c5 00 	sts	0x00C5, r21	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7000c5>
+ 268:	40 93 c4 00 	sts	0x00C4, r20	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7000c4>
+ 26c:	23 c0       	rjmp	.+70     	; 0x2b4 <PSerial_open+0x6e>
+ 26e:	20 93 ca 00 	sts	0x00CA, r18	; 0x8000ca <__TEXT_REGION_LENGTH__+0x7000ca>
+ 272:	e9 ec       	ldi	r30, 0xC9	; 201
+ 274:	f0 e0       	ldi	r31, 0x00	; 0
+ 276:	90 81       	ld	r25, Z
+ 278:	98 61       	ori	r25, 0x18	; 24
+ 27a:	90 83       	st	Z, r25
+ 27c:	50 93 cd 00 	sts	0x00CD, r21	; 0x8000cd <__TEXT_REGION_LENGTH__+0x7000cd>
+ 280:	40 93 cc 00 	sts	0x00CC, r20	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7000cc>
+ 284:	17 c0       	rjmp	.+46     	; 0x2b4 <PSerial_open+0x6e>
+ 286:	20 93 d2 00 	sts	0x00D2, r18	; 0x8000d2 <__TEXT_REGION_LENGTH__+0x7000d2>
+ 28a:	e1 ed       	ldi	r30, 0xD1	; 209
+ 28c:	f0 e0       	ldi	r31, 0x00	; 0
+ 28e:	90 81       	ld	r25, Z
+ 290:	98 61       	ori	r25, 0x18	; 24
+ 292:	90 83       	st	Z, r25
+ 294:	50 93 d5 00 	sts	0x00D5, r21	; 0x8000d5 <__TEXT_REGION_LENGTH__+0x7000d5>
+ 298:	40 93 d4 00 	sts	0x00D4, r20	; 0x8000d4 <__TEXT_REGION_LENGTH__+0x7000d4>
+ 29c:	0b c0       	rjmp	.+22     	; 0x2b4 <PSerial_open+0x6e>
+ 29e:	20 93 32 01 	sts	0x0132, r18	; 0x800132 <__TEXT_REGION_LENGTH__+0x700132>
+ 2a2:	e1 e3       	ldi	r30, 0x31	; 49
+ 2a4:	f1 e0       	ldi	r31, 0x01	; 1
+ 2a6:	90 81       	ld	r25, Z
+ 2a8:	98 61       	ori	r25, 0x18	; 24
+ 2aa:	90 83       	st	Z, r25
+ 2ac:	50 93 35 01 	sts	0x0135, r21	; 0x800135 <__TEXT_REGION_LENGTH__+0x700135>
+ 2b0:	40 93 34 01 	sts	0x0134, r20	; 0x800134 <__TEXT_REGION_LENGTH__+0x700134>
+ 2b4:	91 cf       	rjmp	.-222    	; 0x1d8 <PSerial_read>
+ 2b6:	08 95       	ret
 
-    PSerial_open(0, BAUD115200, SERIAL_8N1);
-	
-	int i;
-	
-	for (int j = 0; j < SP; j++) {
- 1c6:	01 96       	adiw	r24, 0x01	; 1
- 1c8:	2d b7       	in	r18, 0x3d	; 61
- 1ca:	3e b7       	in	r19, 0x3e	; 62
- 1cc:	82 17       	cp	r24, r18
- 1ce:	93 07       	cpc	r25, r19
-        asm("push 0x1");
-        PORTB ^= 0x80;
-        _delay_ms(100);
-		*/
+000002b8 <_exit>:
+ 2b8:	f8 94       	cli
 
-		x_yield();
- 1d0:	c0 f3       	brcs	.-16     	; 0x1c2 <main+0x1e>
- 1d2:	a8 df       	rcall	.-176    	; 0x124 <x_yield>
- 1d4:	fe cf       	rjmp	.-4      	; 0x1d2 <main+0x2e>
-
-000001d6 <PSerial_read>:
- 1d6:	81 30       	cpi	r24, 0x01	; 1
- 1d8:	71 f0       	breq	.+28     	; 0x1f6 <PSerial_read+0x20>
- 1da:	28 f0       	brcs	.+10     	; 0x1e6 <PSerial_read+0x10>
- 1dc:	82 30       	cpi	r24, 0x02	; 2
- 1de:	99 f0       	breq	.+38     	; 0x206 <PSerial_read+0x30>
- 1e0:	83 30       	cpi	r24, 0x03	; 3
- 1e2:	c9 f0       	breq	.+50     	; 0x216 <PSerial_read+0x40>
- 1e4:	20 c0       	rjmp	.+64     	; 0x226 <PSerial_read+0x50>
- 1e6:	80 91 c0 00 	lds	r24, 0x00C0	; 0x8000c0 <__TEXT_REGION_LENGTH__+0x7000c0>
- 1ea:	88 23       	and	r24, r24
- 1ec:	fc f4       	brge	.+62     	; 0x22c <PSerial_read+0x56>
- 1ee:	80 91 c6 00 	lds	r24, 0x00C6	; 0x8000c6 <__TEXT_REGION_LENGTH__+0x7000c6>
- 1f2:	90 e0       	ldi	r25, 0x00	; 0
- 1f4:	08 95       	ret
- 1f6:	80 91 c8 00 	lds	r24, 0x00C8	; 0x8000c8 <__TEXT_REGION_LENGTH__+0x7000c8>
- 1fa:	88 23       	and	r24, r24
- 1fc:	d4 f4       	brge	.+52     	; 0x232 <PSerial_read+0x5c>
- 1fe:	80 91 ce 00 	lds	r24, 0x00CE	; 0x8000ce <__TEXT_REGION_LENGTH__+0x7000ce>
- 202:	90 e0       	ldi	r25, 0x00	; 0
- 204:	08 95       	ret
- 206:	80 91 d0 00 	lds	r24, 0x00D0	; 0x8000d0 <__TEXT_REGION_LENGTH__+0x7000d0>
- 20a:	88 23       	and	r24, r24
- 20c:	ac f4       	brge	.+42     	; 0x238 <PSerial_read+0x62>
- 20e:	80 91 d6 00 	lds	r24, 0x00D6	; 0x8000d6 <__TEXT_REGION_LENGTH__+0x7000d6>
- 212:	90 e0       	ldi	r25, 0x00	; 0
- 214:	08 95       	ret
- 216:	80 91 30 01 	lds	r24, 0x0130	; 0x800130 <__TEXT_REGION_LENGTH__+0x700130>
- 21a:	88 23       	and	r24, r24
- 21c:	84 f4       	brge	.+32     	; 0x23e <PSerial_read+0x68>
- 21e:	80 91 36 01 	lds	r24, 0x0136	; 0x800136 <__TEXT_REGION_LENGTH__+0x700136>
- 222:	90 e0       	ldi	r25, 0x00	; 0
- 224:	08 95       	ret
- 226:	8f ef       	ldi	r24, 0xFF	; 255
- 228:	9f ef       	ldi	r25, 0xFF	; 255
- 22a:	08 95       	ret
- 22c:	8f ef       	ldi	r24, 0xFF	; 255
- 22e:	9f ef       	ldi	r25, 0xFF	; 255
- 230:	08 95       	ret
- 232:	8f ef       	ldi	r24, 0xFF	; 255
- 234:	9f ef       	ldi	r25, 0xFF	; 255
- 236:	08 95       	ret
- 238:	8f ef       	ldi	r24, 0xFF	; 255
- 23a:	9f ef       	ldi	r25, 0xFF	; 255
- 23c:	08 95       	ret
- 23e:	8f ef       	ldi	r24, 0xFF	; 255
- 240:	9f ef       	ldi	r25, 0xFF	; 255
- 242:	08 95       	ret
-
-00000244 <PSerial_open>:
- 244:	81 30       	cpi	r24, 0x01	; 1
- 246:	91 f0       	breq	.+36     	; 0x26c <PSerial_open+0x28>
- 248:	28 f0       	brcs	.+10     	; 0x254 <PSerial_open+0x10>
- 24a:	82 30       	cpi	r24, 0x02	; 2
- 24c:	d9 f0       	breq	.+54     	; 0x284 <PSerial_open+0x40>
- 24e:	83 30       	cpi	r24, 0x03	; 3
- 250:	29 f1       	breq	.+74     	; 0x29c <PSerial_open+0x58>
- 252:	2f c0       	rjmp	.+94     	; 0x2b2 <PSerial_open+0x6e>
- 254:	e1 ec       	ldi	r30, 0xC1	; 193
- 256:	f0 e0       	ldi	r31, 0x00	; 0
- 258:	90 81       	ld	r25, Z
- 25a:	98 61       	ori	r25, 0x18	; 24
- 25c:	90 83       	st	Z, r25
- 25e:	20 93 c2 00 	sts	0x00C2, r18	; 0x8000c2 <__TEXT_REGION_LENGTH__+0x7000c2>
- 262:	50 93 c5 00 	sts	0x00C5, r21	; 0x8000c5 <__TEXT_REGION_LENGTH__+0x7000c5>
- 266:	40 93 c4 00 	sts	0x00C4, r20	; 0x8000c4 <__TEXT_REGION_LENGTH__+0x7000c4>
- 26a:	23 c0       	rjmp	.+70     	; 0x2b2 <PSerial_open+0x6e>
- 26c:	20 93 ca 00 	sts	0x00CA, r18	; 0x8000ca <__TEXT_REGION_LENGTH__+0x7000ca>
- 270:	e9 ec       	ldi	r30, 0xC9	; 201
- 272:	f0 e0       	ldi	r31, 0x00	; 0
- 274:	90 81       	ld	r25, Z
- 276:	98 61       	ori	r25, 0x18	; 24
- 278:	90 83       	st	Z, r25
- 27a:	50 93 cd 00 	sts	0x00CD, r21	; 0x8000cd <__TEXT_REGION_LENGTH__+0x7000cd>
- 27e:	40 93 cc 00 	sts	0x00CC, r20	; 0x8000cc <__TEXT_REGION_LENGTH__+0x7000cc>
- 282:	17 c0       	rjmp	.+46     	; 0x2b2 <PSerial_open+0x6e>
- 284:	20 93 d2 00 	sts	0x00D2, r18	; 0x8000d2 <__TEXT_REGION_LENGTH__+0x7000d2>
- 288:	e1 ed       	ldi	r30, 0xD1	; 209
- 28a:	f0 e0       	ldi	r31, 0x00	; 0
- 28c:	90 81       	ld	r25, Z
- 28e:	98 61       	ori	r25, 0x18	; 24
- 290:	90 83       	st	Z, r25
- 292:	50 93 d5 00 	sts	0x00D5, r21	; 0x8000d5 <__TEXT_REGION_LENGTH__+0x7000d5>
- 296:	40 93 d4 00 	sts	0x00D4, r20	; 0x8000d4 <__TEXT_REGION_LENGTH__+0x7000d4>
- 29a:	0b c0       	rjmp	.+22     	; 0x2b2 <PSerial_open+0x6e>
- 29c:	20 93 32 01 	sts	0x0132, r18	; 0x800132 <__TEXT_REGION_LENGTH__+0x700132>
- 2a0:	e1 e3       	ldi	r30, 0x31	; 49
- 2a2:	f1 e0       	ldi	r31, 0x01	; 1
- 2a4:	90 81       	ld	r25, Z
- 2a6:	98 61       	ori	r25, 0x18	; 24
- 2a8:	90 83       	st	Z, r25
- 2aa:	50 93 35 01 	sts	0x0135, r21	; 0x800135 <__TEXT_REGION_LENGTH__+0x700135>
- 2ae:	40 93 34 01 	sts	0x0134, r20	; 0x800134 <__TEXT_REGION_LENGTH__+0x700134>
- 2b2:	91 cf       	rjmp	.-222    	; 0x1d6 <PSerial_read>
- 2b4:	08 95       	ret
-
-000002b6 <_exit>:
- 2b6:	f8 94       	cli
-
-000002b8 <__stop_program>:
- 2b8:	ff cf       	rjmp	.-2      	; 0x2b8 <__stop_program>
+000002ba <__stop_program>:
+ 2ba:	ff cf       	rjmp	.-2      	; 0x2ba <__stop_program>
