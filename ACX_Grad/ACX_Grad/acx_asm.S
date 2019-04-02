@@ -11,7 +11,11 @@
  #include <avr/io.h>
  #include "acx.h"
 
+
+
 		.section .text
+__SP_L__ =  0x3e
+__SP_H__ =  0x3d
 		.global x_yield
 x_yield:
 ;------------------------------------------------------------------------
@@ -38,7 +42,7 @@ x_yield:
 
 	; save stack pointer in appropriate array location
     ;---------------------------
-	;in r24, __SP
+;	in r24, 
 
  	lds r30, x_thread_id        ; get stack ID
  	ldi r31, 0
@@ -50,11 +54,15 @@ x_yield:
  	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
  	subi r31, hi8(-(stackControlTable))
 
-	movw X, SP
+	in r24, __SP_L__
+	in r25, __SP_H__
+
+	st Z , r24
+
 	
 
 
-    st Z, X					; store stack pointer in stackControlTable
+;    st Z, X					; store stack pointer in stackControlTable
  	;st r31,	hi8(SP)
 
 	; Check for stack overflows

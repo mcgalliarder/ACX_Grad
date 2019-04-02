@@ -18,6 +18,13 @@ int main(void)
     DDRB |= 0x80;
 
     PSerial_open(0, BAUD115200, SERIAL_8N1);
+	
+	int i;
+	
+	for (int j = 0; j < SP; j++) {
+		i = (int) SP;
+	}
+	
 	/*
     x_init();
 
