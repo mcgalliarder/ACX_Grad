@@ -32,13 +32,9 @@ int main(void)
         PORTB ^= 0x80;
         _delay_ms(100);
 		*/
-		//x_yield();
-		for(int i = 0; i < 8; i++) {
-			int j = bit2mask8(i);
-			PSprintf(0,"%x\n\r",j);
-			_delay_ms(1000);
-			//PSerial_write(0,);	
-		}
+
+		x_yield();
+
     }
 }
 

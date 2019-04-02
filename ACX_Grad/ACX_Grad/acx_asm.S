@@ -22,16 +22,58 @@ x_yield:
 ; Save thread context
 ;-------------------------------------------------------------------------
 
-; your code here...
+    ; Save registers for calling thread
+	push r2 // Save and restore callee-save registers
+	push r3 // Push onto calling thread's stack
+	push r4
+	push r5
+	push r6
+	push r7
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+	push r16
+	push r17
 
-	push r8 // Save and restore callee-save registers
-	push r9 // Push onto calling thread's stack
+	; save stack pointer in appropriate array location
+
+	; Check for stack overflows
+
+	; Determine next thread to run
+
+	; Retrieve next stack pointer for next thread
+
+    ; restore new thread's stack pointer
+    cli             ; begin stack pointer change
+        ; do stack pointer change here
+    sei             ; end  stack pointer change
 
 
-
-	//When exiting pop them from stack in reverse order
+    ; restore new thread's registers 
+	pop r17
+	pop r16
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
 	pop r9
 	pop r8
+	pop r7
+	pop r6
+	pop r5
+	pop r4
+	pop r3
+	pop r2
+
+	ret
+	
 ;------------------------------------------------------------------------
 ; Schedule next thread -- must use caller save registers below here
 ;                         because we can reach this without saving regs
