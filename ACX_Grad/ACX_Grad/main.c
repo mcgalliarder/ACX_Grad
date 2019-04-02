@@ -21,15 +21,10 @@ int main(void)
 
     x_init();
 
-    _delay_ms(5000);
-    PSprintf(0, "T0 Stack pointer: %X\n\r", mem + T0_STACK_BASE_OFFS);
-    _delay_ms(1000);
-    
+    x_yield();
+	
     while (1) {
-        PSprintf(0, "Stack: %X\n\r", SP);
-        asm("push 0x1");
-        PORTB ^= 0x80;
-        _delay_ms(100);
+       
     }
 } }
 }
