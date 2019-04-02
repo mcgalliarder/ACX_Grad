@@ -27,6 +27,15 @@ void kernalInit(void) {
 
     x_thread_id = 0; // current thread
     x_thread_mask = 0x01;
+
+    stackControlTable = {{T0_STACK_BASE_OFFS + mem, T0_STACK_BASE_OFFS + mem},
+                         {T1_STACK_BASE_OFFS + mem, T1_STACK_BASE_OFFS + mem},
+                         {T2_STACK_BASE_OFFS + mem, T2_STACK_BASE_OFFS + mem},
+                         {T3_STACK_BASE_OFFS + mem, T3_STACK_BASE_OFFS + mem},
+                         {T4_STACK_BASE_OFFS + mem, T4_STACK_BASE_OFFS + mem},
+                         {T5_STACK_BASE_OFFS + mem, T5_STACK_BASE_OFFS + mem},
+                         {T6_STACK_BASE_OFFS + mem, T6_STACK_BASE_OFFS + mem},
+                         {T7_STACK_BASE_OFFS + mem, T7_STACK_BASE_OFFS + mem}};
 }
 
 //---------------------------------------------------

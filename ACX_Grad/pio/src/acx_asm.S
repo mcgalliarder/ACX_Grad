@@ -12,10 +12,6 @@
  #include "acx.h"
 
 		.section .text
-
-
-//lookup: .db 1, 2, 4, 8, 16, 32, 64, 128
-		
 		.global x_yield
 x_yield:
 ;------------------------------------------------------------------------
@@ -41,24 +37,45 @@ x_yield:
 	push r17
 
 	; save stack pointer in appropriate array location
- 	ldi r16, getTID()
+    ;---------------------------
+
+ 	lds r30, x_thread_id        ; get stack ID
+ 	ldi r31, 0
+
+ 	lsl r30                     ; get stack control table offset
+ 	rol r31
+ 	lsl r30
+ 	rol r31
+ 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	subi r31, hi8(-(stackControlTable))
+
+    st Z, SP                            ; store stack pointer in stackControlTable
+ 	
 	; Check for stack overflows
- 	mov r20, r16 
- 	mul r20, T0_STACK_SIZE
- 	ldi r30, lo8(mem)
+    ;---------------------------
+
+
+ 	
+ 	ldi r30, lo8(mem)           ; Init Z pointer to &mem
  	ldi r31, hi8(mem)
+ 	
+ 	
 	; Determine next thread to run
  	; threadID * stacksize for canary
+    ;---------------------------
 
 	; Retrieve next stack pointer for next thread
+    ;---------------------------
 
     ; restore new thread's stack pointer
+    ;---------------------------
     cli             ; begin stack pointer change
         ; do stack pointer change here
     sei             ; end  stack pointer change
 
 
     ; restore new thread's registers 
+    ;---------------------------
 	pop r17
 	pop r16
 	pop r15
