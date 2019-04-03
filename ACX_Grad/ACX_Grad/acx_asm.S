@@ -83,6 +83,7 @@ x_yield:
 	ldi r30, lo8(mem)           ; Init Z pointer to &mem
  	ldi r31, hi8(mem)
 
+ 	; threadID * stacksize for canary
 	; int offset = x_thread_id * 256
 	ldi r24, 0
 	lds r25,	x_thread_id
@@ -94,15 +95,40 @@ x_yield:
 	breq noSOF
 SOF:
 	; Execute if there is a stack overflow
-	ldi r24,	0xAA
-	st	Z,		r24	; replace mutated canary
+	call x_stack_overflow
 noSOF:
 	; No stack overflow
- 	
- 	
+ 
+	
+;------------------------------------------------------------------------
+; Schedule next thread -- must use caller save registers below here
+;                         because we can reach this without saving regs
+;                         if reached from k_new() function
+;-------------------------------------------------------------------------
+		.global	x_schedule
+x_schedule:
+
 	; Determine next thread to run
- 	; threadID * stacksize for canary
     ;---------------------------
+	lds r18, x_thread_id
+scan_begin:
+	subi r18, -1			; get next thhread
+	andi r18, 0x07			; mod by numthreads
+
+	lds r19, disable
+	lds r20, suspend
+	lds r21, delay
+
+	or r21, r20
+	or r21, r19
+
+	mov r24, r18
+	call bit2mask8			; get mask of bit (thread_id + 1) % numthreads
+
+	and r21, r24
+	cp r21, r24
+	brne scan_begin
+
 
 	; Retrieve next stack pointer for next thread
     ;---------------------------
@@ -114,6 +140,14 @@ noSOF:
     sei             ; end  stack pointer change
 
 
+;---------------------------------------------------
+; Restore context of next READY thread
+;---------------------------------------------------
+restore:
+
+	
+ 	
+	
     ; restore new thread's registers 
     ;---------------------------
 	pop r17
@@ -134,29 +168,7 @@ noSOF:
 	pop r2
 
 	ret
-	
-;------------------------------------------------------------------------
-; Schedule next thread -- must use caller save registers below here
-;                         because we can reach this without saving regs
-;                         if reached from k_new() function
-;-------------------------------------------------------------------------
-		.global	x_schedule
-x_schedule:
 
-; your code here
-
-
-
-;---------------------------------------------------
-; Restore context of next READY thread
-;---------------------------------------------------
-restore:
-
-; your code here
-
-
-	// Return to next thread
-		ret
 
 //----------------------------------------------------------------------------------------------
 //  Function: bit2mask8
@@ -172,15 +184,14 @@ restore:
 bit2mask8:
 
 		;r24 contains thread ID input
+		/*
 		cpi r24, 1
 		brlo none
-		/*
 		cp 8, r24
 		brge none
-
-		ldi r25, 1
 		*/
  		adc r24, 1
+		ldi r25, 1
 again:
 
 		dec r24

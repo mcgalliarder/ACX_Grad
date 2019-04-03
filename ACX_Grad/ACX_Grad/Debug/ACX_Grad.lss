@@ -3,31 +3,31 @@ ACX_Grad.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000020  00800200  0000022a  000002be  2**0
+  0 .data         00000020  00800200  00000348  000003dc  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         0000022a  00000000  00000000  00000094  2**1
+  1 .text         00000348  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00001005  00800220  00800220  000002de  2**0
+  2 .bss          00001005  00800220  00800220  000003fc  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  000002de  2**0
+  3 .comment      00000030  00000000  00000000  000003fc  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000310  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  0000042c  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000a8  00000000  00000000  00000350  2**3
+  5 .debug_aranges 000000b0  00000000  00000000  00000470  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000107c  00000000  00000000  000003f8  2**0
+  6 .debug_info   000012d0  00000000  00000000  00000520  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000d15  00000000  00000000  00001474  2**0
+  7 .debug_abbrev 00000deb  00000000  00000000  000017f0  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   000006b5  00000000  00000000  00002189  2**0
+  8 .debug_line   00000824  00000000  00000000  000025db  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000000d8  00000000  00000000  00002840  2**2
+  9 .debug_frame  00000104  00000000  00000000  00002e00  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000062a  00000000  00000000  00002918  2**0
+ 10 .debug_str    00000693  00000000  00000000  00002f04  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00000014  00000000  00000000  00002f42  2**0
+ 11 .debug_loc    0000033f  00000000  00000000  00003597  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000068  00000000  00000000  00002f56  2**0
+ 12 .debug_ranges 00000070  00000000  00000000  000038d6  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -162,8 +162,8 @@ Disassembly of section .text:
   f4:	12 e0       	ldi	r17, 0x02	; 2
   f6:	a0 e0       	ldi	r26, 0x00	; 0
   f8:	b2 e0       	ldi	r27, 0x02	; 2
-  fa:	ea e2       	ldi	r30, 0x2A	; 42
-  fc:	f2 e0       	ldi	r31, 0x02	; 2
+  fa:	e8 e4       	ldi	r30, 0x48	; 72
+  fc:	f3 e0       	ldi	r31, 0x03	; 3
   fe:	00 e0       	ldi	r16, 0x00	; 0
  100:	0b bf       	out	0x3b, r16	; 59
  102:	02 c0       	rjmp	.+4      	; 0x108 <__do_copy_data+0x14>
@@ -186,8 +186,8 @@ Disassembly of section .text:
  118:	a5 32       	cpi	r26, 0x25	; 37
  11a:	b2 07       	cpc	r27, r18
  11c:	e1 f7       	brne	.-8      	; 0x116 <.do_clear_bss_loop>
- 11e:	7f d0       	rcall	.+254    	; 0x21e <main>
- 120:	82 c0       	rjmp	.+260    	; 0x226 <_exit>
+ 11e:	0e d1       	rcall	.+540    	; 0x33c <main>
+ 120:	11 c1       	rjmp	.+546    	; 0x344 <_exit>
 
 00000122 <__bad_interrupt>:
  122:	6e cf       	rjmp	.-292    	; 0x0 <__vectors>
@@ -272,6 +272,7 @@ Disassembly of section .text:
  	ldi r31, hi8(mem)
  160:	fa e0       	ldi	r31, 0x0A	; 10
 
+ 	; threadID * stacksize for canary
 	; int offset = x_thread_id * 256
 	ldi r24, 0
  162:	80 e0       	ldi	r24, 0x00	; 0
@@ -286,259 +287,416 @@ Disassembly of section .text:
 	cpi	r24,	0xAA
  16c:	8a 3a       	cpi	r24, 0xAA	; 170
 	breq noSOF
- 16e:	11 f0       	breq	.+4      	; 0x174 <noSOF>
+ 16e:	09 f0       	breq	.+2      	; 0x172 <x_schedule>
 
 00000170 <SOF>:
 SOF:
 	; Execute if there is a stack overflow
-	ldi r24,	0xAA
- 170:	8a ea       	ldi	r24, 0xAA	; 170
-	st	Z,		r24	; replace mutated canary
- 172:	80 83       	st	Z, r24
+	call x_stack_overflow
+ 170:	89 d0       	rcall	.+274    	; 0x284 <x_stack_overflow>
 
-00000174 <noSOF>:
+00000172 <x_schedule>:
+		.global	x_schedule
+x_schedule:
+
+	; Determine next thread to run
+    ;---------------------------
+	lds r18, x_thread_id
+ 172:	20 91 20 02 	lds	r18, 0x0220	; 0x800220 <__data_end>
+
+00000176 <scan_begin>:
+scan_begin:
+	subi r18, -1			; get next thhread
+ 176:	2f 5f       	subi	r18, 0xFF	; 255
+	andi r18, 0x07			; mod by numthreads
+ 178:	27 70       	andi	r18, 0x07	; 7
+
+	lds r19, disable
+ 17a:	30 91 22 0a 	lds	r19, 0x0A22	; 0x800a22 <disable>
+	lds r20, suspend
+ 17e:	40 91 21 0a 	lds	r20, 0x0A21	; 0x800a21 <suspend>
+	lds r21, delay
+ 182:	50 91 23 12 	lds	r21, 0x1223	; 0x801223 <delay>
+
+	or r21, r20
+ 186:	54 2b       	or	r21, r20
+	or r21, r19
+ 188:	53 2b       	or	r21, r19
+
+	mov r24, r18
+	call bit2mask8			; get mask of bit (thread_id + 1) % numthreads
+ 18a:	82 2f       	mov	r24, r18
+ 18c:	16 d0       	rcall	.+44     	; 0x1ba <bit2mask8>
+
+	and r21, r24
+ 18e:	58 23       	and	r21, r24
+	cp r21, r24
+ 190:	58 17       	cp	r21, r24
+	brne scan_begin
+ 192:	89 f7       	brne	.-30     	; 0x176 <scan_begin>
 	; Retrieve next stack pointer for next thread
     ;---------------------------
 
     ; restore new thread's stack pointer
     ;---------------------------
     cli             ; begin stack pointer change
- 174:	f8 94       	cli
+ 194:	f8 94       	cli
         ; do stack pointer change here
     sei             ; end  stack pointer change
- 176:	78 94       	sei
+ 196:	78 94       	sei
 
-
+00000198 <restore>:
+	
+ 	
+	
     ; restore new thread's registers 
     ;---------------------------
 	pop r17
- 178:	1f 91       	pop	r17
+ 198:	1f 91       	pop	r17
 	pop r16
- 17a:	0f 91       	pop	r16
+ 19a:	0f 91       	pop	r16
 	pop r15
- 17c:	ff 90       	pop	r15
+ 19c:	ff 90       	pop	r15
 	pop r14
- 17e:	ef 90       	pop	r14
+ 19e:	ef 90       	pop	r14
 	pop r13
- 180:	df 90       	pop	r13
+ 1a0:	df 90       	pop	r13
 	pop r12
- 182:	cf 90       	pop	r12
+ 1a2:	cf 90       	pop	r12
 	pop r11
- 184:	bf 90       	pop	r11
+ 1a4:	bf 90       	pop	r11
 	pop r10
- 186:	af 90       	pop	r10
+ 1a6:	af 90       	pop	r10
 	pop r9
- 188:	9f 90       	pop	r9
+ 1a8:	9f 90       	pop	r9
 	pop r8
- 18a:	8f 90       	pop	r8
+ 1aa:	8f 90       	pop	r8
 	pop r7
- 18c:	7f 90       	pop	r7
+ 1ac:	7f 90       	pop	r7
 	pop r6
- 18e:	6f 90       	pop	r6
+ 1ae:	6f 90       	pop	r6
 	pop r5
- 190:	5f 90       	pop	r5
+ 1b0:	5f 90       	pop	r5
 	pop r4
- 192:	4f 90       	pop	r4
+ 1b2:	4f 90       	pop	r4
 	pop r3
- 194:	3f 90       	pop	r3
+ 1b4:	3f 90       	pop	r3
 	pop r2
- 196:	2f 90       	pop	r2
+ 1b6:	2f 90       	pop	r2
 
 	ret
- 198:	08 95       	ret
+ 1b8:	08 95       	ret
 
-0000019a <x_schedule>:
-
-; your code here
-
-
-	// Return to next thread
-		ret
- 19a:	08 95       	ret
-
-0000019c <bit2mask8>:
-
-		.global bit2mask8
-bit2mask8:
-
-		;r24 contains thread ID input
+000001ba <bit2mask8>:
 		cpi r24, 1
- 19c:	81 30       	cpi	r24, 0x01	; 1
 		brlo none
- 19e:	48 f0       	brcs	.+18     	; 0x1b2 <none>
 		cp 8, r24
 		brge none
-
-		ldi r25, 1
 		*/
  		adc r24, 1
- 1a0:	81 1d       	adc	r24, r1
+ 1ba:	81 1d       	adc	r24, r1
+		ldi r25, 1
+ 1bc:	91 e0       	ldi	r25, 0x01	; 1
 
-000001a2 <again>:
+000001be <again>:
 again:
 
 		dec r24
- 1a2:	8a 95       	dec	r24
+ 1be:	8a 95       	dec	r24
 		cpi r24, 1
- 1a4:	81 30       	cpi	r24, 0x01	; 1
+ 1c0:	81 30       	cpi	r24, 0x01	; 1
 		brlo done
- 1a6:	10 f0       	brcs	.+4      	; 0x1ac <done>
 		lsl r25
- 1a8:	99 0f       	add	r25, r25
+ 1c2:	10 f0       	brcs	.+4      	; 0x1c8 <done>
 		jmp again
- 1aa:	fb cf       	rjmp	.-10     	; 0x1a2 <again>
-
-000001ac <done>:
+ 1c4:	99 0f       	add	r25, r25
 
 done:	mov r24, r25
- 1ac:	89 2f       	mov	r24, r25
-		ldi r25, 0
-		jmp finished
- 1ae:	90 e0       	ldi	r25, 0x00	; 0
- 1b0:	02 c0       	rjmp	.+4      	; 0x1b6 <finished>
+ 1c6:	fb cf       	rjmp	.-10     	; 0x1be <again>
 
-000001b2 <none>:
+000001c8 <done>:
+		ldi r25, 0
+ 1c8:	89 2f       	mov	r24, r25
+		jmp finished
+ 1ca:	90 e0       	ldi	r25, 0x00	; 0
+ 1cc:	02 c0       	rjmp	.+4      	; 0x1d2 <finished>
+
+000001ce <none>:
 
 none:
 		ldi r25, 0
- 1b2:	90 e0       	ldi	r25, 0x00	; 0
+ 1ce:	90 e0       	ldi	r25, 0x00	; 0
 		ldi r24, 0	
- 1b4:	80 e0       	ldi	r24, 0x00	; 0
+ 1d0:	80 e0       	ldi	r24, 0x00	; 0
 
-000001b6 <finished>:
+000001d2 <finished>:
 finished:
 		ret
- 1b6:	08 95       	ret
+ 1d2:	08 95       	ret
 
-000001b8 <kernalInit>:
+000001d4 <kernalInit>:
+void x_enable(uint8_t ID) {
+	cli();
 
-//---------------------------------------------------
-// Initialize all kernal state variables
-//---------------------------------------------------
-void kernalInit(void) {
-    disable = 0xFE;
- 1b8:	8e ef       	ldi	r24, 0xFE	; 254
- 1ba:	80 93 22 0a 	sts	0x0A22, r24	; 0x800a22 <disable>
-    suspend = 0x00;
- 1be:	10 92 21 0a 	sts	0x0A21, r1	; 0x800a21 <suspend>
-    delay = 0x00;
- 1c2:	10 92 23 12 	sts	0x1223, r1	; 0x801223 <delay>
- 1c6:	e1 e2       	ldi	r30, 0x21	; 33
- 1c8:	f2 e0       	ldi	r31, 0x02	; 2
- 1ca:	81 e3       	ldi	r24, 0x31	; 49
- 1cc:	92 e0       	ldi	r25, 0x02	; 2
+	// Your initialization code here
 
-    for (int i = 0; i < MAXTHREADS; i++)
-        // no delays
-        delayCounters[i] = 0; 
- 1ce:	11 92       	st	Z+, r1
- 1d0:	11 92       	st	Z+, r1
-void kernalInit(void) {
-    disable = 0xFE;
-    suspend = 0x00;
-    delay = 0x00;
+	sei();
+ 1d4:	8e ef       	ldi	r24, 0xFE	; 254
+ 1d6:	80 93 22 0a 	sts	0x0A22, r24	; 0x800a22 <disable>
+ 1da:	10 92 21 0a 	sts	0x0A21, r1	; 0x800a21 <suspend>
+ 1de:	10 92 23 12 	sts	0x1223, r1	; 0x801223 <delay>
+ 1e2:	e1 e2       	ldi	r30, 0x21	; 33
+ 1e4:	f2 e0       	ldi	r31, 0x02	; 2
+ 1e6:	81 e3       	ldi	r24, 0x31	; 49
+ 1e8:	92 e0       	ldi	r25, 0x02	; 2
+ 1ea:	11 92       	st	Z+, r1
+ 1ec:	11 92       	st	Z+, r1
+ 1ee:	e8 17       	cp	r30, r24
+ 1f0:	f9 07       	cpc	r31, r25
+ 1f2:	d9 f7       	brne	.-10     	; 0x1ea <kernalInit+0x16>
+ 1f4:	10 92 20 02 	sts	0x0220, r1	; 0x800220 <__data_end>
+ 1f8:	81 e0       	ldi	r24, 0x01	; 1
+ 1fa:	80 93 24 12 	sts	0x1224, r24	; 0x801224 <x_thread_mask>
+ 1fe:	08 95       	ret
 
-    for (int i = 0; i < MAXTHREADS; i++)
- 1d2:	e8 17       	cp	r30, r24
- 1d4:	f9 07       	cpc	r31, r25
- 1d6:	d9 f7       	brne	.-10     	; 0x1ce <kernalInit+0x16>
-        // no delays
-        delayCounters[i] = 0; 
+00000200 <placeCanaries>:
+ 200:	8a ea       	ldi	r24, 0xAA	; 170
+ 202:	80 93 23 0a 	sts	0x0A23, r24	; 0x800a23 <mem>
+ 206:	80 93 23 0b 	sts	0x0B23, r24	; 0x800b23 <mem+0x100>
+ 20a:	80 93 23 0c 	sts	0x0C23, r24	; 0x800c23 <mem+0x200>
+ 20e:	80 93 23 0d 	sts	0x0D23, r24	; 0x800d23 <mem+0x300>
+ 212:	80 93 23 0e 	sts	0x0E23, r24	; 0x800e23 <mem+0x400>
+ 216:	80 93 23 0f 	sts	0x0F23, r24	; 0x800f23 <mem+0x500>
+ 21a:	80 93 23 10 	sts	0x1023, r24	; 0x801023 <mem+0x600>
+ 21e:	80 93 23 11 	sts	0x1123, r24	; 0x801123 <mem+0x700>
+ 222:	08 95       	ret
 
-    x_thread_id = 0; // current thread
- 1d8:	10 92 20 02 	sts	0x0220, r1	; 0x800220 <__data_end>
-    x_thread_mask = 0x01;
- 1dc:	81 e0       	ldi	r24, 0x01	; 1
- 1de:	80 93 24 12 	sts	0x1224, r24	; 0x801224 <x_thread_mask>
- 1e2:	08 95       	ret
+00000224 <x_init>:
+ 224:	0f 93       	push	r16
+ 226:	1f 93       	push	r17
+ 228:	cf 93       	push	r28
+ 22a:	df 93       	push	r29
+ 22c:	00 d0       	rcall	.+0      	; 0x22e <x_init+0xa>
+ 22e:	cd b7       	in	r28, 0x3d	; 61
+ 230:	de b7       	in	r29, 0x3e	; 62
+ 232:	0d b7       	in	r16, 0x3d	; 61
+ 234:	1e b7       	in	r17, 0x3e	; 62
+ 236:	f8 94       	cli
+ 238:	cd df       	rcall	.-102    	; 0x1d4 <kernalInit>
+ 23a:	e2 df       	rcall	.-60     	; 0x200 <placeCanaries>
+ 23c:	f8 01       	movw	r30, r16
+ 23e:	80 85       	ldd	r24, Z+8	; 0x08
+ 240:	89 83       	std	Y+1, r24	; 0x01
+ 242:	81 85       	ldd	r24, Z+9	; 0x09
+ 244:	8a 83       	std	Y+2, r24	; 0x02
+ 246:	82 85       	ldd	r24, Z+10	; 0x0a
+ 248:	8b 83       	std	Y+3, r24	; 0x03
+ 24a:	82 e2       	ldi	r24, 0x22	; 34
+ 24c:	9b e0       	ldi	r25, 0x0B	; 11
+ 24e:	9e bf       	out	0x3e, r25	; 62
+ 250:	8d bf       	out	0x3d, r24	; 61
+ 252:	ed b7       	in	r30, 0x3d	; 61
+ 254:	fe b7       	in	r31, 0x3e	; 62
+ 256:	8b 81       	ldd	r24, Y+3	; 0x03
+ 258:	80 83       	st	Z, r24
+ 25a:	8a 81       	ldd	r24, Y+2	; 0x02
+ 25c:	df 01       	movw	r26, r30
+ 25e:	11 97       	sbiw	r26, 0x01	; 1
+ 260:	8c 93       	st	X, r24
+ 262:	89 81       	ldd	r24, Y+1	; 0x01
+ 264:	32 97       	sbiw	r30, 0x02	; 2
+ 266:	80 83       	st	Z, r24
+ 268:	8d b7       	in	r24, 0x3d	; 61
+ 26a:	9e b7       	in	r25, 0x3e	; 62
+ 26c:	0a 97       	sbiw	r24, 0x0a	; 10
+ 26e:	9e bf       	out	0x3e, r25	; 62
+ 270:	8d bf       	out	0x3d, r24	; 61
+ 272:	78 94       	sei
+ 274:	0f 90       	pop	r0
+ 276:	0f 90       	pop	r0
+ 278:	0f 90       	pop	r0
+ 27a:	df 91       	pop	r29
+ 27c:	cf 91       	pop	r28
+ 27e:	1f 91       	pop	r17
+ 280:	0f 91       	pop	r16
+ 282:	08 95       	ret
 
-000001e4 <placeCanaries>:
+00000284 <x_stack_overflow>:
+	// return to caller.
+}
 
-//---------------------------------------------------
-// Stack Control
-//---------------------------------------------------
-void placeCanaries(void) {
-    mem[T0_CANARY_OFFS] = CANARY;
- 1e4:	8a ea       	ldi	r24, 0xAA	; 170
- 1e6:	80 93 23 0a 	sts	0x0A23, r24	; 0x800a23 <mem>
-    mem[T1_CANARY_OFFS] = CANARY;
- 1ea:	80 93 23 0b 	sts	0x0B23, r24	; 0x800b23 <mem+0x100>
-    mem[T2_CANARY_OFFS] = CANARY;
- 1ee:	80 93 23 0c 	sts	0x0C23, r24	; 0x800c23 <mem+0x200>
-    mem[T3_CANARY_OFFS] = CANARY;
- 1f2:	80 93 23 0d 	sts	0x0D23, r24	; 0x800d23 <mem+0x300>
-    mem[T4_CANARY_OFFS] = CANARY;
- 1f6:	80 93 23 0e 	sts	0x0E23, r24	; 0x800e23 <mem+0x400>
-    mem[T5_CANARY_OFFS] = CANARY;
- 1fa:	80 93 23 0f 	sts	0x0F23, r24	; 0x800f23 <mem+0x500>
-    mem[T6_CANARY_OFFS] = CANARY;
- 1fe:	80 93 23 10 	sts	0x1023, r24	; 0x801023 <mem+0x600>
-    mem[T7_CANARY_OFFS] = CANARY;
- 202:	80 93 23 11 	sts	0x1123, r24	; 0x801123 <mem+0x700>
- 206:	08 95       	ret
+// called from X_yield if the canary is malformed
+void x_stack_overflow(void) {
+	DDRB |= 0x80;
+ 284:	27 9a       	sbi	0x04, 7	; 4
 
-00000208 <x_init>:
-// void x_yield(void)
-// void x_schedule(void)
+	// return to caller.
+}
 
-void x_init(void)
-{
-	asm("cli");
- 208:	f8 94       	cli
+// called from X_yield if the canary is malformed
+void x_stack_overflow(void) {
+ 286:	23 e0       	ldi	r18, 0x03	; 3
+ 288:	30 e0       	ldi	r19, 0x00	; 0
+	#else
+		//round up by default
+		__ticks_dc = (uint32_t)(ceil(fabs(__tmp)));
+	#endif
 
-    // initialize kernal data structures
-    kernalInit();
- 20a:	d6 df       	rcall	.-84     	; 0x1b8 <kernalInit>
-    // place canary values
-    placeCanaries();
- 20c:	eb df       	rcall	.-42     	; 0x1e4 <placeCanaries>
- 20e:	8d b7       	in	r24, 0x3d	; 61
+	__builtin_avr_delay_cycles(__ticks_dc);
+ 28a:	4f ef       	ldi	r20, 0xFF	; 255
+ 28c:	81 ee       	ldi	r24, 0xE1	; 225
+ 28e:	94 e0       	ldi	r25, 0x04	; 4
+ 290:	41 50       	subi	r20, 0x01	; 1
+ 292:	80 40       	sbci	r24, 0x00	; 0
+ 294:	90 40       	sbci	r25, 0x00	; 0
+ 296:	e1 f7       	brne	.-8      	; 0x290 <x_stack_overflow+0xc>
+ 298:	00 c0       	rjmp	.+0      	; 0x29a <x_stack_overflow+0x16>
+ 29a:	00 00       	nop
+	DDRB |= 0x80;
+	while (1) {
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+ 29c:	2f 9a       	sbi	0x05, 7	; 5
+ 29e:	4f ef       	ldi	r20, 0xFF	; 255
+ 2a0:	81 ee       	ldi	r24, 0xE1	; 225
+ 2a2:	94 e0       	ldi	r25, 0x04	; 4
+ 2a4:	41 50       	subi	r20, 0x01	; 1
+ 2a6:	80 40       	sbci	r24, 0x00	; 0
+ 2a8:	90 40       	sbci	r25, 0x00	; 0
+ 2aa:	e1 f7       	brne	.-8      	; 0x2a4 <x_stack_overflow+0x20>
+ 2ac:	00 c0       	rjmp	.+0      	; 0x2ae <x_stack_overflow+0x2a>
+ 2ae:	00 00       	nop
+			_delay_ms(100);
+			PORTB ^= 0x80;
+ 2b0:	85 b1       	in	r24, 0x05	; 5
+ 2b2:	80 58       	subi	r24, 0x80	; 128
+ 2b4:	85 b9       	out	0x05, r24	; 5
+ 2b6:	21 50       	subi	r18, 0x01	; 1
+ 2b8:	31 09       	sbc	r19, r1
 
-    // Save the stack pointer as a byte pointer
-    byte * stackP = (byte *) SP;
- 210:	9e b7       	in	r25, 0x3e	; 62
- 212:	82 e2       	ldi	r24, 0x22	; 34
-    ret.addr[0] = * (stackP - 1);
-    ret.addr[1] = * (stackP - 2);
-    ret.addr[2] = * (stackP - 3);
+// called from X_yield if the canary is malformed
+void x_stack_overflow(void) {
+	DDRB |= 0x80;
+	while (1) {
+		for (int i = 0; i < 3; i++) {
+ 2ba:	39 f7       	brne	.-50     	; 0x28a <x_stack_overflow+0x6>
+ 2bc:	23 e0       	ldi	r18, 0x03	; 3
+ 2be:	30 e0       	ldi	r19, 0x00	; 0
+ 2c0:	4f ef       	ldi	r20, 0xFF	; 255
+ 2c2:	85 ea       	ldi	r24, 0xA5	; 165
+ 2c4:	9e e0       	ldi	r25, 0x0E	; 14
+ 2c6:	41 50       	subi	r20, 0x01	; 1
+ 2c8:	80 40       	sbci	r24, 0x00	; 0
+ 2ca:	90 40       	sbci	r25, 0x00	; 0
+ 2cc:	e1 f7       	brne	.-8      	; 0x2c6 <x_stack_overflow+0x42>
+ 2ce:	00 c0       	rjmp	.+0      	; 0x2d0 <x_stack_overflow+0x4c>
+ 2d0:	00 00       	nop
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(300);
+			PORTB |= 0x80;
+ 2d2:	2f 9a       	sbi	0x05, 7	; 5
+ 2d4:	4f ef       	ldi	r20, 0xFF	; 255
+ 2d6:	85 ea       	ldi	r24, 0xA5	; 165
+ 2d8:	9e e0       	ldi	r25, 0x0E	; 14
+ 2da:	41 50       	subi	r20, 0x01	; 1
+ 2dc:	80 40       	sbci	r24, 0x00	; 0
+ 2de:	90 40       	sbci	r25, 0x00	; 0
+ 2e0:	e1 f7       	brne	.-8      	; 0x2da <x_stack_overflow+0x56>
+ 2e2:	00 c0       	rjmp	.+0      	; 0x2e4 <x_stack_overflow+0x60>
+ 2e4:	00 00       	nop
+			_delay_ms(300);
+			PORTB ^= 0x80;
+ 2e6:	85 b1       	in	r24, 0x05	; 5
+ 2e8:	80 58       	subi	r24, 0x80	; 128
+ 2ea:	85 b9       	out	0x05, r24	; 5
+ 2ec:	21 50       	subi	r18, 0x01	; 1
+ 2ee:	31 09       	sbc	r19, r1
+			_delay_ms(100);
+			PORTB |= 0x80;
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+ 2f0:	39 f7       	brne	.-50     	; 0x2c0 <x_stack_overflow+0x3c>
+ 2f2:	23 e0       	ldi	r18, 0x03	; 3
+ 2f4:	30 e0       	ldi	r19, 0x00	; 0
+ 2f6:	4f ef       	ldi	r20, 0xFF	; 255
+ 2f8:	81 ee       	ldi	r24, 0xE1	; 225
+ 2fa:	94 e0       	ldi	r25, 0x04	; 4
+ 2fc:	41 50       	subi	r20, 0x01	; 1
+ 2fe:	80 40       	sbci	r24, 0x00	; 0
+ 300:	90 40       	sbci	r25, 0x00	; 0
+ 302:	e1 f7       	brne	.-8      	; 0x2fc <x_stack_overflow+0x78>
+ 304:	00 c0       	rjmp	.+0      	; 0x306 <x_stack_overflow+0x82>
+ 306:	00 00       	nop
+			_delay_ms(300);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+ 308:	2f 9a       	sbi	0x05, 7	; 5
+ 30a:	4f ef       	ldi	r20, 0xFF	; 255
+ 30c:	81 ee       	ldi	r24, 0xE1	; 225
+ 30e:	94 e0       	ldi	r25, 0x04	; 4
+ 310:	41 50       	subi	r20, 0x01	; 1
+ 312:	80 40       	sbci	r24, 0x00	; 0
+ 314:	90 40       	sbci	r25, 0x00	; 0
+ 316:	e1 f7       	brne	.-8      	; 0x310 <x_stack_overflow+0x8c>
+ 318:	00 c0       	rjmp	.+0      	; 0x31a <x_stack_overflow+0x96>
+ 31a:	00 00       	nop
+			_delay_ms(100);
+			PORTB ^= 0x80;
+ 31c:	85 b1       	in	r24, 0x05	; 5
+ 31e:	80 58       	subi	r24, 0x80	; 128
+ 320:	85 b9       	out	0x05, r24	; 5
+ 322:	21 50       	subi	r18, 0x01	; 1
+ 324:	31 09       	sbc	r19, r1
+			_delay_ms(300);
+			PORTB |= 0x80;
+			_delay_ms(300);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+ 326:	39 f7       	brne	.-50     	; 0x2f6 <x_stack_overflow+0x72>
+ 328:	2f ef       	ldi	r18, 0xFF	; 255
+ 32a:	45 ea       	ldi	r20, 0xA5	; 165
+ 32c:	8e e0       	ldi	r24, 0x0E	; 14
+ 32e:	21 50       	subi	r18, 0x01	; 1
+ 330:	40 40       	sbci	r20, 0x00	; 0
+ 332:	80 40       	sbci	r24, 0x00	; 0
+ 334:	e1 f7       	brne	.-8      	; 0x32e <x_stack_overflow+0xaa>
+ 336:	00 c0       	rjmp	.+0      	; 0x338 <x_stack_overflow+0xb4>
+ 338:	00 00       	nop
+ 33a:	a5 cf       	rjmp	.-182    	; 0x286 <x_stack_overflow+0x2>
 
-    // change the stack pointer to the bottom of T0
-    SP = (int) (mem + T0_STACK_BASE_OFFS);
- 214:	9b e0       	ldi	r25, 0x0B	; 11
- 216:	9e bf       	out	0x3e, r25	; 62
- 218:	8d bf       	out	0x3d, r24	; 61
- 21a:	78 94       	sei
-    // push the old return address onto the new stack
-    asm("push %0" : "=r" (ret.addr[2]));
-    asm("push %0" : "=r" (ret.addr[1]));
-    asm("push %0" : "=r" (ret.addr[0]));
-
-	asm("sei");
- 21c:	08 95       	ret
-
-0000021e <main>:
+0000033c <main>:
 #include "PSerial.h"
 #include "acx.h"
 
 int main(void)
 {
     DDRB |= 0x80;
- 21e:	27 9a       	sbi	0x04, 7	; 4
+ 33c:	27 9a       	sbi	0x04, 7	; 4
 
     //PSerial_open(0, BAUD115200, SERIAL_8N1);
 
 	x_init();
- 220:	f3 df       	rcall	.-26     	; 0x208 <x_init>
+ 33e:	72 df       	rcall	.-284    	; 0x224 <x_init>
 	
     while (1) {
 		
 
 		x_yield();
- 222:	80 df       	rcall	.-256    	; 0x124 <x_yield>
- 224:	fe cf       	rjmp	.-4      	; 0x222 <main+0x4>
+ 340:	f1 de       	rcall	.-542    	; 0x124 <x_yield>
+ 342:	fe cf       	rjmp	.-4      	; 0x340 <main+0x4>
 
-00000226 <_exit>:
- 226:	f8 94       	cli
+00000344 <_exit>:
+ 344:	f8 94       	cli
 
-00000228 <__stop_program>:
- 228:	ff cf       	rjmp	.-2      	; 0x228 <__stop_program>
+00000346 <__stop_program>:
+ 346:	ff cf       	rjmp	.-2      	; 0x346 <__stop_program>

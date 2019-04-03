@@ -31,7 +31,7 @@
 #define MAX_DELAY 1024
 
 // includes max number of threads and number used
-#define CANARY 0xAA;
+#define CANARY 0xAA;	// If this is changed, change it in the canary check in X_yield as well
 
 #define MAXTHREADS 8
 #define THREADSUSED 8
@@ -141,6 +141,7 @@ void            x_disable(uint8_t);
 void            x_enable(uint8_t);
 void            kernalInit(void);
 void            placeCanaries(void);
+void			x_stack_overflow(void);
 
 
 #endif

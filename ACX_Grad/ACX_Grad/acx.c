@@ -24,6 +24,7 @@
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include <util/atomic.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -107,6 +108,10 @@ void placeCanaries(void) {
 
 void x_init(void)
 {
+	// Save the stack pointer as a byte pointer
+	byte * stackP = (byte *) SP;
+	
+	
 	asm("cli");
 
     // initialize kernal data structures
@@ -115,22 +120,26 @@ void x_init(void)
     placeCanaries();
 
     // Save the stack pointer as a byte pointer
-    byte * stackP = (byte *) SP;
 
     // create a PTUnion and save the return address
-    PTUnion ret;
-    ret.addr[0] = * (stackP - 1);
-    ret.addr[1] = * (stackP - 2);
-    ret.addr[2] = * (stackP - 3);
+    volatile PTUnion ret;
+    ret.addr[0] = * (stackP + 8);
+    ret.addr[1] = * (stackP + 9);
+    ret.addr[2] = * (stackP + 10);
 
     // change the stack pointer to the bottom of T0
     SP = (int) (mem + T0_STACK_BASE_OFFS);
 
     // push the old return address onto the new stack
-    asm("push %0" : "=r" (ret.addr[2]));
-    asm("push %0" : "=r" (ret.addr[1]));
-    asm("push %0" : "=r" (ret.addr[0]));
+	int stackpointer = SP - (int) mem;
+	mem[stackpointer--] = ret.addr[2];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[0];
+	SP = SP - 10;
+	
 
+
+	
 	asm("sei");
 
 	// return to caller.
@@ -207,5 +216,31 @@ void x_enable(uint8_t ID) {
 	sei();
 
 	// return to caller.
+}
+
+// called from X_yield if the canary is malformed
+void x_stack_overflow(void) {
+	DDRB |= 0x80;
+	while (1) {
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(300);
+			PORTB |= 0x80;
+			_delay_ms(300);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		_delay_ms(300);
+	}
 }
 
