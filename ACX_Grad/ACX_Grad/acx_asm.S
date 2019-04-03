@@ -127,27 +127,36 @@ scan_begin:
 
 	and r21, r24
 	cp r21, r24
-	brne scan_begin
+	breq scan_begin
 
 
 	; Retrieve next stack pointer for next thread
     ;---------------------------
+	mov r30, r18        ; get stack ID
+ 	ldi r31, 0
+
+ 	lsl r30                     ; get stack control table offset
+ 	rol r31
+ 	lsl r30
+ 	rol r31
+ 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	subi r31, hi8(-(stackControlTable))
+
+	ld	r24, Z+					
+	ld	r25, Z
 
     ; restore new thread's stack pointer
     ;---------------------------
-    cli             ; begin stack pointer change
-        ; do stack pointer change here
+    cli             ; begin stack pointer change		
+	out __SP_L__, r24
+	out __SP_H__, r25
     sei             ; end  stack pointer change
-
 
 ;---------------------------------------------------
 ; Restore context of next READY thread
 ;---------------------------------------------------
 restore:
-
-	
  	
-	
     ; restore new thread's registers 
     ;---------------------------
 	pop r17

@@ -25,7 +25,9 @@ int main(void)
 		
 
 		x_yield();
-
+		
+		PORTB ^= 0x80;
+		_delay_ms(500);
     }
 }
 
