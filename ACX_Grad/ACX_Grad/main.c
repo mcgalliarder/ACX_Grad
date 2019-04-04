@@ -18,6 +18,8 @@ void testThread(void);
 
 int main(void)
 {
+	//int j;
+	//for(int i = 0; i < 8; i++) j = bit2mask8(i);
    volatile int j = 0;
    x_init();
    x_new(1, testThread, true);  // create thread, ID=1

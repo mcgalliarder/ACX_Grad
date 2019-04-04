@@ -39,14 +39,14 @@ byte x_thread_id;
 byte x_thread_mask;
 byte mem[STACK_MEM_SIZE];
 
-stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS , T0_STACK_BASE_OFFS},
-											   {T1_STACK_BASE_OFFS , T1_STACK_BASE_OFFS},
-											   {T2_STACK_BASE_OFFS , T2_STACK_BASE_OFFS},
-											   {T3_STACK_BASE_OFFS , T3_STACK_BASE_OFFS},
-											   {T4_STACK_BASE_OFFS , T4_STACK_BASE_OFFS},
-											   {T5_STACK_BASE_OFFS , T5_STACK_BASE_OFFS},
-											   {T6_STACK_BASE_OFFS , T6_STACK_BASE_OFFS},
-											   {T7_STACK_BASE_OFFS , T7_STACK_BASE_OFFS}};
+stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
+											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
+											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS+ (int) mem},
+											   {T3_STACK_BASE_OFFS + (int) mem, T3_STACK_BASE_OFFS+ (int) mem},
+											   {T4_STACK_BASE_OFFS + (int) mem, T4_STACK_BASE_OFFS+ (int) mem},
+											   {T5_STACK_BASE_OFFS + (int) mem, T5_STACK_BASE_OFFS+ (int) mem},
+											   {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS+ (int) mem},
+											   {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS+ (int) mem}};
 
 //---------------------------------------------------
 // Initialize all kernel state variables
@@ -180,13 +180,13 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	volatile PTUnion ret = {thread};
 	
-	int stackpointer = stackControlTable[ID].spBase;
+	int stackpointer = stackControlTable[ID].spBase - (int) mem;
 	
 	mem[stackpointer--] = ret.addr[2];
 	mem[stackpointer--] = ret.addr[1];
 	mem[stackpointer--] = ret.addr[0];
 	
-	stackControlTable[ID].sp = stackControlTable[ID].spBase - 18;
+	stackControlTable[ID].sp = stackControlTable[ID].spBase - 21; //18
 	
 	char disablebit = enable << ID;
 	disable = (enable) ? disable & ~disablebit : disable | disablebit ;

@@ -29,8 +29,8 @@
 
 
 		.section .text
-__SP_L__ =  0x3e
-__SP_H__ =  0x3d
+__SP_L__ =  0x3d
+__SP_H__ =  0x3e
 		.global x_yield
 x_yield:
 ;------------------------------------------------------------------------
@@ -54,6 +54,8 @@ x_yield:
 	push r15
 	push r16
 	push r17
+	push r28
+	push r29
 
 	; save stack pointer in appropriate array location
     ;---------------------------
@@ -159,6 +161,8 @@ restore:
  	
     ; restore new thread's registers 
     ;---------------------------
+	pop r29
+	pop r28
 	pop r17
 	pop r16
 	pop r15
@@ -191,15 +195,8 @@ restore:
 
 		.global bit2mask8
 bit2mask8:
-
 		;r24 contains thread ID input
-		/*
-		cpi r24, 1
-		brlo none
-		cp 8, r24
-		brge none
-		*/
- 		adc r24, 1
+ 		subi r24, -1
 		ldi r25, 1
 again:
 
@@ -211,6 +208,8 @@ again:
 
 done:	mov r24, r25
 		ldi r25, 0
+		ret
+/*
 		jmp finished
 
 none:
@@ -218,4 +217,4 @@ none:
 		ldi r24, 0	
 finished:
 		ret
-
+*/
