@@ -3,7 +3,7 @@
  *
  * Created: 3/26/2019 12:34:55 PM
  *  Author: Andrew Thorp
- *
+ * Author: Eli McGalliard mcgalliarder
  *
  *       **************************************************
  *       **************************************************
@@ -39,17 +39,17 @@ byte x_thread_id;
 byte x_thread_mask;
 byte mem[STACK_MEM_SIZE];
 
-stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS + (int) mem},
-											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS + (int) mem},
-											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS + (int) mem},
-											   {T3_STACK_BASE_OFFS + (int) mem, T3_STACK_BASE_OFFS + (int) mem},
-											   {T4_STACK_BASE_OFFS + (int) mem, T4_STACK_BASE_OFFS + (int) mem},
-											   {T5_STACK_BASE_OFFS + (int) mem, T5_STACK_BASE_OFFS + (int) mem},
-											   {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS + (int) mem},
-											   {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS + (int) mem}};
+stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS , T0_STACK_BASE_OFFS},
+											   {T1_STACK_BASE_OFFS , T1_STACK_BASE_OFFS},
+											   {T2_STACK_BASE_OFFS , T2_STACK_BASE_OFFS},
+											   {T3_STACK_BASE_OFFS , T3_STACK_BASE_OFFS},
+											   {T4_STACK_BASE_OFFS , T4_STACK_BASE_OFFS},
+											   {T5_STACK_BASE_OFFS , T5_STACK_BASE_OFFS},
+											   {T6_STACK_BASE_OFFS , T6_STACK_BASE_OFFS},
+											   {T7_STACK_BASE_OFFS , T7_STACK_BASE_OFFS}};
 
 //---------------------------------------------------
-// Initialize all kernal state variables
+// Initialize all kernel state variables
 //---------------------------------------------------
 void kernalInit(void) {
     disable = 0xFE;
@@ -188,6 +188,8 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	
 	stackControlTable[ID].sp = stackControlTable[ID].spBase - 18;
 	
+	char disablebit = enable << ID;
+	disable = (enable) ? disable & ~disablebit : disable | disablebit ;
 
 	sei();
 

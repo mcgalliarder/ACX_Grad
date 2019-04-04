@@ -13,22 +13,30 @@
 #include "PSerial.h"
 #include "acx.h"
 
+
+void testThread(void);
+
 int main(void)
 {
-    DDRB |= 0x80;
+   volatile int j = 0;
+   x_init();
+   x_new(1, testThread, true);  // create thread, ID=1
+// x_new(0, testThread, true);  // replace current thread
+   while(1){
+      j++;
+      x_yield();
+   }
+}
 
-    //PSerial_open(0, BAUD115200, SERIAL_8N1);
-
-	x_init();
-	
-    while (1) {
-		
-
-		x_yield();
-		
-		PORTB ^= 0x80;
-		_delay_ms(500);
-
-    }
+//------------------------
+// A test thread
+//------------------------
+void testThread(void)
+{
+   volatile int i = 0;
+   while(1){
+      i++;
+      x_yield();
+   }
 }
 
