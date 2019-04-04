@@ -7,25 +7,28 @@
 
 #include <avr/io.h>
 #include <stdbool.h>
-#include <acx.h>
-#include <acxserial.h>
+//#include <acx.h>
 #include <util/delay.h>
+#include "acxserial.h"
 #include "PSerial.h"
-
+#include "acx.h"
 
 int main(void)
 {
     DDRB |= 0x80;
 
-    PSerial_open(0, BAUD115200, SERIAL_8N1);
+    //PSerial_open(0, BAUD115200, SERIAL_8N1);
 
-    x_init();
-
-    x_yield();
+	x_init();
 	
     while (1) {
-       
+		
+
+		x_yield();
+		
+		PORTB ^= 0x80;
+		_delay_ms(500);
+
     }
-} }
 }
 

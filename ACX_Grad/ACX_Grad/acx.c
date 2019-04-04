@@ -4,14 +4,49 @@
  * Created: 3/26/2019 12:34:55 PM
  *  Author: Andrew Thorp
  *
+ *
+ *       **************************************************
+ *       **************************************************
+ *       **     _   _   _                _______   __    **
+ *       **    | | (_) | |         /\   / ____\ \ / /    **
+ *       **    | |  _  | |__      /  \ | |     \ V /     **
+ *       **    | | | | | '_ \    / /\ \| |      > <      **
+ *       **    | | | | | |_) |  / ____ \ |____ / . \     **
+ *       **    |_| |_| |_.__/  /_/    \_\_____/_/ \_\    **
+ *       **                                              **
+ *       **                                 Andrew Thorp **
+ *       **                               Eli McGalliard **
+ *       **************************************************
+ *       **************************************************
+ *
+ *
  */
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
+#include <util/delay.h>
 #include <util/atomic.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include "acx.h"
+
+
+byte disable;
+byte suspend;
+byte delay;
+unsigned int delayCounters[MAX_DELAY];
+byte x_thread_id;
+byte x_thread_mask;
+byte mem[STACK_MEM_SIZE];
+
+stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS + (int) mem},
+											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS + (int) mem},
+											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS + (int) mem},
+											   {T3_STACK_BASE_OFFS + (int) mem, T3_STACK_BASE_OFFS + (int) mem},
+											   {T4_STACK_BASE_OFFS + (int) mem, T4_STACK_BASE_OFFS + (int) mem},
+											   {T5_STACK_BASE_OFFS + (int) mem, T5_STACK_BASE_OFFS + (int) mem},
+											   {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS + (int) mem},
+											   {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS + (int) mem}};
 
 //---------------------------------------------------
 // Initialize all kernal state variables
@@ -73,7 +108,11 @@ void placeCanaries(void) {
 
 void x_init(void)
 {
-	cli();
+	// Save the stack pointer as a byte pointer
+	byte * stackP = (byte *) SP;
+	
+	
+	asm("cli");
 
     // initialize kernal data structures
     kernalInit();
@@ -81,23 +120,27 @@ void x_init(void)
     placeCanaries();
 
     // Save the stack pointer as a byte pointer
-    byte * stackP = (byte *) SP;
 
     // create a PTUnion and save the return address
-    PTUnion ret;
-    ret.addr[0] = * (stackP - 1);
-    ret.addr[1] = * (stackP - 2);
-    ret.addr[2] = * (stackP - 3);
+    volatile PTUnion ret;
+    ret.addr[0] = * (stackP + 8);
+    ret.addr[1] = * (stackP + 9);
+    ret.addr[2] = * (stackP + 10);
 
     // change the stack pointer to the bottom of T0
     SP = (int) (mem + T0_STACK_BASE_OFFS);
 
     // push the old return address onto the new stack
-    asm("push %0" : "=r" (ret.addr[2]));
-    asm("push %0" : "=r" (ret.addr[1]));
-    asm("push %0" : "=r" (ret.addr[0]));
+	int stackpointer = SP - (int) mem;
+	mem[stackpointer--] = ret.addr[2];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[0];
+	SP = SP - 10;
+	
 
-	sei();
+
+	
+	asm("sei");
 
 	// return to caller.
 }
@@ -173,5 +216,31 @@ void x_enable(uint8_t ID) {
 	sei();
 
 	// return to caller.
+}
+
+// called from X_yield if the canary is malformed
+void x_stack_overflow(void) {
+	DDRB |= 0x80;
+	while (1) {
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(300);
+			PORTB |= 0x80;
+			_delay_ms(300);
+			PORTB ^= 0x80;
+		}
+		for (int i = 0; i < 3; i++) {
+			_delay_ms(100);
+			PORTB |= 0x80;
+			_delay_ms(100);
+			PORTB ^= 0x80;
+		}
+		_delay_ms(300);
+	}
 }
 

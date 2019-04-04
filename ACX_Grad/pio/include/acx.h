@@ -31,7 +31,7 @@
 #define MAX_DELAY 1024
 
 // includes max number of threads and number used
-#define CANARY 0xAA;	// If this is changed, change it in the canary check in X_yield as well
+#define CANARY 0xAA;
 
 #define MAXTHREADS 8
 #define THREADSUSED 8
@@ -93,6 +93,13 @@
 typedef uint8_t byte;
 #endif
 
+byte disable;
+byte suspend;
+byte delay;
+unsigned int delayCounters[MAX_DELAY];
+byte x_thread_id;
+byte x_thread_mask;
+byte mem[STACK_MEM_SIZE];
 
 
 // macro to access the current thread id
@@ -124,6 +131,14 @@ typedef struct ctrl {
     int spBase;
 } stackControl;
 
+stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS + (int) mem},
+                                               {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS + (int) mem},
+                                               {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS + (int) mem},
+                                               {T3_STACK_BASE_OFFS + (int) mem, T3_STACK_BASE_OFFS + (int) mem},
+                                               {T4_STACK_BASE_OFFS + (int) mem, T4_STACK_BASE_OFFS + (int) mem},
+                                               {T5_STACK_BASE_OFFS + (int) mem, T5_STACK_BASE_OFFS + (int) mem},
+                                               {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS + (int) mem},
+                                               {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS + (int) mem}};
 
 //----------------------------------------------------------------------------
 // ACX Function prototypes
@@ -141,7 +156,6 @@ void            x_disable(uint8_t);
 void            x_enable(uint8_t);
 void            kernalInit(void);
 void            placeCanaries(void);
-void			x_stack_overflow(void);
 
 
 #endif
