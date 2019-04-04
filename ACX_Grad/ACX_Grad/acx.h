@@ -112,7 +112,7 @@ typedef void (*PTHREAD)(void);
 //---------------------------------------------------------------------------
 
 typedef union {
- 	//PTHREAD pthread;
+ 	PTHREAD pthread;
  	byte addr[3];
 } PTUnion;
 

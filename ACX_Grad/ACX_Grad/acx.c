@@ -167,11 +167,27 @@ unsigned long x_gtime() {
 }
 
 
-
+/*
+ * x_new initializes a new thread in the system
+ * 
+ * ID - the new thread ID (0 - 7). If a thread with the same ID already exists
+ *		the new thread will replace the current thread of that ID
+ * newThread -  a function pointer that takes no parameters and returns nothing. 
+ * 				We may later change this to accept parameters.
+ * isEnabled - the initial status of the thread--1 means enabled, 0 means disabled.
+ */
 void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
-
-	// Your initialization code here
+	volatile PTUnion ret = {thread};
+	
+	int stackpointer = stackControlTable[ID].spBase;
+	
+	mem[stackpointer--] = ret.addr[2];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[0];
+	
+	stackControlTable[ID].sp = stackControlTable[ID].spBase - 18;
+	
 
 	sei();
 
