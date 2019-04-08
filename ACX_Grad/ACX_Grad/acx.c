@@ -178,7 +178,9 @@ unsigned long x_gtime() {
  */
 void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
-	volatile PTUnion ret = {thread};
+	//volatile PTUnion ret = {*thread};
+	volatile PTUnion ret;
+	ret.pthread = thread;
 	
 	int stackpointer = stackControlTable[ID].spBase - (int) mem;
 	

@@ -38,6 +38,7 @@ x_yield:
 ;-------------------------------------------------------------------------
 
     ; Save registers for calling thread
+	push r1 //Just in case
 	push r2 // Save and restore callee-save registers
 	push r3 // Push onto calling thread's stack
 	push r4
@@ -68,8 +69,8 @@ x_yield:
  	rol r31
  	lsl r30
  	rol r31
- 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
- 	subi r31, hi8(-(stackControlTable))
+ 	sbci r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	sbci r31, hi8(-(stackControlTable))
 
 	in	r24, __SP_L__			; Put SP in r24-25
 	in	r25, __SP_H__
@@ -113,10 +114,7 @@ x_schedule:
 	; Determine next thread to run
     ;---------------------------
 	lds r18, x_thread_id
-scan_begin:
-	subi r18, -1			; get next thhread
-	andi r18, 0x07			; mod by numthreads
-
+	
 	lds r19, disable
 	lds r20, suspend
 	lds r21, delay
@@ -124,11 +122,16 @@ scan_begin:
 	or r21, r20
 	or r21, r19
 
+scan_begin:
+	subi r18, -1			; get next thhread
+	andi r18, 0x07			; mod by numthreads
+
 	mov r24, r18
 	call bit2mask8			; get mask of bit (thread_id + 1) % numthreads
 
 	and r21, r24
 	cp r21, r24
+
 	breq scan_begin
 
 
@@ -137,12 +140,12 @@ scan_begin:
 	mov r30, r18        ; get stack ID
  	ldi r31, 0
 
- 	lsl r30                     ; get stack control table offset
+ 	lsl r30             ; get stack control table offset
  	rol r31
  	lsl r30
  	rol r31
- 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
- 	subi r31, hi8(-(stackControlTable))
+ 	sbci r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	sbci r31, hi8(-(stackControlTable))
 
 	ld	r24, Z+					
 	ld	r25, Z
@@ -179,6 +182,7 @@ restore:
 	pop r4
 	pop r3
 	pop r2
+	pop r1
 
 	ret
 
