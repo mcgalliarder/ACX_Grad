@@ -115,11 +115,15 @@ void x_init(void)
 void x_delay(unsigned int time) {
 	if (time > MAX_DELAY) time = MAX_DELAY;
 	cli();
-
-	// Your initialization code here
-	x_thread_delay[x_thread_id] = time; // copy delay value into calling thread's counter
-	delay |= bit2mask8(x_thread_id); // set x_delay_status bit corresponding to thread's id
-	x_yield(); // initiate thread rescheduling
+    
+	// copy delay value into calling thread's counter
+	x_thread_delay[x_thread_id] = time;
+	
+	// set x_delay_status bit corresponding to thread's id 
+	delay |= bit2mask8(x_thread_id); 
+	
+	// initiate thread rescheduling
+	x_yield(); 
 	sei();
 	// return to caller.
 }
@@ -272,8 +276,19 @@ void setTimer() {
 
 ISR(TIMER1_COMPA_vect){
 	//decrement x_thread_id's timer	
-	ATOMIC_BLOCK
-	if (x_thread_delay[x_thread_id])
-		x_thread_delay[x_thread_id]--;
+	ATOMIC_BLOCK // Need to unblock somehow afterwards?
 	
+	//check x_delay_thread for every thread
+	for(int i = 0; i < MAXTHREADS; i++) {
+		// check if thread is currently delayed
+		int delayStatus = bit2mask8(i) & delay; 
+		//if the delay status is not zero and the count isn't zero
+		if (x_thread_delay[i] && delayStatus) { 
+			// decrement count
+			x_thread_delay[x_thread_id]--;
+			//if counter is now zero then clear delay bit
+			if (!x_thread_delay[x_thread_id])
+				delay &= ^(bit2mask8(x_thread_id));
+		}
+	}
 }
