@@ -13,7 +13,8 @@
 #include "acx.h"
 
 
-void testThread(void);
+void thread0Blink(void);
+void thread1Blink(void);
 
 int main(void)
 {

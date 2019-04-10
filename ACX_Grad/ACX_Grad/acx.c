@@ -59,7 +59,7 @@ void kernalInit(void) {
 
     for (int i = 0; i < MAXTHREADS; i++)
         // no delays
-        delayCounters[i] = 0; 
+        x_thread_delay[i] = 0; 
 
     x_thread_id = 0; // current thread
     x_thread_mask = 0x01;
@@ -276,7 +276,7 @@ void setTimer() {
 
 ISR(TIMER1_COMPA_vect){
 	//decrement x_thread_id's timer	
-	ATOMIC_BLOCK // Need to unblock somehow afterwards?
+	//ATOMIC_BLOCK; // Need to unblock somehow afterwards?
 	
 	//check x_delay_thread for every thread
 	for(int i = 0; i < MAXTHREADS; i++) {
@@ -291,7 +291,7 @@ ISR(TIMER1_COMPA_vect){
 			
 			//if counter is now zero then clear delay bit
 			if (!x_thread_delay[x_thread_id])
-				delay &= ^(bit2mask8(x_thread_id));
+				delay &= ~(bit2mask8(x_thread_id));
 		}
 	}
 }
