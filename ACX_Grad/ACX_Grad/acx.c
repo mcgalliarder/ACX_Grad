@@ -245,8 +245,8 @@ void setTimer() {
 	TCNT1 = 0;
 
 	// period 333.33 ms, on-time = 75 ms
-	int TOP1 = 16144; // OFFTIME
-	int TOP2 = 4688;  // ONTIME
+	int TOP1 = 63;//16144; // OFFTIME
+	int TOP2 = 63;//4688;  // ONTIME
 
 	cli();
 	TCCR1A = 0x00;

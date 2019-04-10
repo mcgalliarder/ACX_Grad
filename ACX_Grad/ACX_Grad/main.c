@@ -18,27 +18,29 @@ void testThread(void);
 
 int main(void)
 {
-	//int j;
-	//for(int i = 0; i < 8; i++) j = bit2mask8(i);
-   volatile int j = 0;
    x_init();
-   x_new(1, testThread, true);  // create thread, ID=1
-// x_new(0, testThread, true);  // replace current thread
+   x_new(0, thread0Blink, true); 
+   x_new(1, thread1Blink, true);  
    while(1){
-      j++;
-      x_yield();
+	
    }
 }
 
 //------------------------
 // A test thread
 //------------------------
-void testThread(void)
+void thread0Blink(void)
 {
-   volatile int i = 0;
    while(1){
-      i++;
-      x_yield();
+     x_delay(1500);
+	 //blink the LED
    }
+}
+
+void thread1Blink(void) {
+	while(1) {
+	  x_delay(500);
+	  //blink the LED
+	}
 }
 
