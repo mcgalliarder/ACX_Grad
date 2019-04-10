@@ -35,7 +35,7 @@ byte disable;
 byte suspend;
 byte delay;
 //unsigned int delayCounters[MAX_DELAY];
-uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
+volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
 byte x_thread_id;
 byte x_thread_mask;
 byte mem[STACK_MEM_SIZE];
@@ -85,15 +85,12 @@ void x_init(void)
 	// Save the stack pointer as a byte pointer
 	byte * stackP = (byte *) SP;
 	
-	
 	asm("cli");
 
     // initialize kernal data structures
     kernalInit();
     // place canary values
     placeCanaries();
-
-    // Save the stack pointer as a byte pointer
 
     // create a PTUnion and save the return address
     volatile PTUnion ret;
@@ -111,11 +108,7 @@ void x_init(void)
 	mem[stackpointer--] = ret.addr[2];
 	SP = SP - 10;
 	
-
-
-	
 	asm("sei");
-
 	// return to caller.
 }
 
@@ -124,9 +117,10 @@ void x_delay(unsigned int time) {
 	cli();
 
 	// Your initialization code here
-	x_thread_delay[x_thread_id] = time;
+	x_thread_delay[x_thread_id] = time; // copy delay value into calling thread's counter
+	delay |= bit2mask8(x_thread_id); // set x_delay_status bit corresponding to thread's id
+	x_yield(); // initiate thread rescheduling
 	sei();
-
 	// return to caller.
 }
 
@@ -242,7 +236,7 @@ void x_stack_overflow(void) {
 	}
 }
 
-void setTimer(int threadsID) {
+void setTimer() {
 	PRR0 = 0x00;
 	TCNT1 = 0;
 
@@ -278,4 +272,8 @@ void setTimer(int threadsID) {
 
 ISR(TIMER1_COMPA_vect){
 	//decrement x_thread_id's timer	
+	ATOMIC_BLOCK
+	if (x_thread_delay[x_thread_id])
+		x_thread_delay[x_thread_id]--;
+	
 }
