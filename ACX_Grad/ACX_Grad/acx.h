@@ -28,7 +28,7 @@
 
 // C and Assembly definitions
 
-#define MAX_DELAY 1024
+#define MAX_DELAY 65535 //1024
 
 // includes max number of threads and number used
 #define CANARY 0xAA;	// If this is changed, change it in the canary check in X_yield as well

@@ -79,33 +79,6 @@ void placeCanaries(void) {
     mem[T7_CANARY_OFFS] = CANARY;
 }
 
-//---------------------------------------------------
-// Stack Memory
-//---------------------------------------------------
-
-//---------------------------------------------------
-// Thread Delay Counters
-//---------------------------------------------------
-
-
-//---------------------------------------------------
-// Exec State Variables
-//---------------------------------------------------
-
-
-
-//---------------------------------------------------
-// Local Functions
-//---------------------------------------------------
-
-
-//---------------------------------------------------
-// ACX Functions
-//---------------------------------------------------
-//
-// defined in acx_asm.S
-// void x_yield(void)
-// void x_schedule(void)
 
 void x_init(void)
 {
@@ -151,7 +124,7 @@ void x_delay(unsigned int time) {
 	cli();
 
 	// Your initialization code here
-
+	x_thread_delay[x_thread_id] = time;
 	sei();
 
 	// return to caller.
@@ -269,3 +242,40 @@ void x_stack_overflow(void) {
 	}
 }
 
+void setTimer(int threadsID) {
+	PRR0 = 0x00;
+	TCNT1 = 0;
+
+	// period 333.33 ms, on-time = 75 ms
+	int TOP1 = 16144; // OFFTIME
+	int TOP2 = 4688;  // ONTIME
+
+	cli();
+	TCCR1A = 0x00;
+	TCCR1B = 0x00;
+	//TCCR0A = 0x02; //Sets CTC mode of operation?
+
+	// configure match register
+	ICR1 = TOP1;
+	OCR1A = TOP2;    // 75 msec
+	TCCR1B = 0x04;   // clk/256 from prescaler
+
+	// turn on CTC mode:
+	TCCR1B |= (1 << WGM12);
+
+	// Set CS10 and CS12 bits for 1024 prescaler:
+	TCCR1B |= (1 << CS10);
+	TCCR1B |= (1 << CS12);
+
+	// enable timer compare interrupt:
+	TIMSK1 |= (1 << OCIE1A);
+	sei();          // enable global interrupts
+
+	// setup initial output state
+	DDRB = 0x80;
+	PORTB |= 0x80;
+}
+
+ISR(TIMER1_COMPA_vect){
+	//decrement x_thread_id's timer	
+}
