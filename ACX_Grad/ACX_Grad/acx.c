@@ -34,7 +34,8 @@
 byte disable;
 byte suspend;
 byte delay;
-unsigned int delayCounters[MAX_DELAY];
+//unsigned int delayCounters[MAX_DELAY];
+uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
 byte x_thread_id;
 byte x_thread_mask;
 byte mem[STACK_MEM_SIZE];
@@ -146,6 +147,7 @@ void x_init(void)
 }
 
 void x_delay(unsigned int time) {
+	if (time > MAX_DELAY) time = MAX_DELAY;
 	cli();
 
 	// Your initialization code here
