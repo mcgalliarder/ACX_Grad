@@ -282,10 +282,13 @@ ISR(TIMER1_COMPA_vect){
 	for(int i = 0; i < MAXTHREADS; i++) {
 		// check if thread is currently delayed
 		int delayStatus = bit2mask8(i) & delay; 
+		
 		//if the delay status is not zero and the count isn't zero
 		if (x_thread_delay[i] && delayStatus) { 
+			
 			// decrement count
 			x_thread_delay[x_thread_id]--;
+			
 			//if counter is now zero then clear delay bit
 			if (!x_thread_delay[x_thread_id])
 				delay &= ^(bit2mask8(x_thread_id));

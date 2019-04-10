@@ -142,7 +142,7 @@ void            x_enable(uint8_t);
 void            kernalInit(void);
 void            placeCanaries(void);
 void			x_stack_overflow(void);
-
+void			setTimer(void);
 
 #endif
 

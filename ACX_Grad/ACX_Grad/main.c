@@ -20,6 +20,7 @@ int main(void)
    DDRB = 0x80;
    PORTB |= 0x80;
    x_init();
+   setTimer();
    x_new(0, thread0Blink, true); 
    x_new(1, thread1Blink, true);  
    while(1){
