@@ -69,7 +69,7 @@ x_yield:
  	rol r31
  	lsl r30
  	rol r31
- 	sbci r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
  	sbci r31, hi8(-(stackControlTable))
 
 	in	r24, __SP_L__			; Put SP in r24-25
@@ -144,7 +144,7 @@ scan_begin:
  	rol r31
  	lsl r30
  	rol r31
- 	sbci r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+ 	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
  	sbci r31, hi8(-(stackControlTable))
 
 	ld	r24, Z+					

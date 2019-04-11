@@ -180,6 +180,9 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
 	volatile PTUnion ret;
+	ret.addr[2] = 0;
+	ret.addr[1] = 0;
+	ret.addr[0] = 0;
 	ret.pthread = thread;
 	
 	int stackpointer = stackControlTable[ID].spBase - (int) mem;
@@ -188,7 +191,7 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	mem[stackpointer--] = ret.addr[1];
 	mem[stackpointer--] = ret.addr[0];
 	
-	stackControlTable[ID].sp = stackControlTable[ID].spBase - 21; //18
+	stackControlTable[ID].sp = stackControlTable[ID].spBase - 22; //18
 	
 	char disablebit = enable << ID;
 	disable = (enable) ? disable & ~disablebit : disable | disablebit ;
