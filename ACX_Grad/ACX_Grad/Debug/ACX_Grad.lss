@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000648  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000d0  00000000  00000000  00000688  2**3
+  5 .debug_aranges 000000d8  00000000  00000000  00000688  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000014a6  00000000  00000000  00000758  2**0
+  6 .debug_info   0000150b  00000000  00000000  00000760  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000ecb  00000000  00000000  00001bfe  2**0
+  7 .debug_abbrev 00000ec7  00000000  00000000  00001c6b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000a18  00000000  00000000  00002ac9  2**0
+  8 .debug_line   00000a47  00000000  00000000  00002b32  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000001b0  00000000  00000000  000034e4  2**2
+  9 .debug_frame  000001c0  00000000  00000000  0000357c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000006f4  00000000  00000000  00003694  2**0
+ 10 .debug_str    000006fc  00000000  00000000  0000373c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000005e8  00000000  00000000  00003d88  2**0
+ 11 .debug_loc    0000066c  00000000  00000000  00003e38  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000090  00000000  00000000  00004370  2**0
+ 12 .debug_ranges 00000098  00000000  00000000  000044a4  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -467,7 +467,7 @@ void x_enable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	disable &= ~bit2mask8(ID);
 	sei();
  1f2:	8e ef       	ldi	r24, 0xFE	; 254
  1f4:	80 93 22 02 	sts	0x0222, r24	; 0x800222 <disable>
@@ -809,9 +809,9 @@ void setTimer() {
  420:	10 92 85 00 	sts	0x0085, r1	; 0x800085 <__TEXT_REGION_LENGTH__+0x700085>
  424:	10 92 84 00 	sts	0x0084, r1	; 0x800084 <__TEXT_REGION_LENGTH__+0x700084>
 
-	// period 333.33 ms, on-time = 75 ms
-	int TOP1 = 63;//16144; // OFFTIME
-	int TOP2 = 63;//4688;  // ONTIME
+	// period 333.33 ms @ 16144, on-time = 75 ms @ 4688
+	int TOP1 = 63; // OFFTIME - 1 ms
+	int TOP2 = 63;// ONTIME - 1 ms
 
 	cli();
  428:	f8 94       	cli

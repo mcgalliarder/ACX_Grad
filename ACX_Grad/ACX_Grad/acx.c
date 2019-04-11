@@ -112,6 +112,9 @@ void x_init(void)
 	// return to caller.
 }
 
+uint8_t x_getID() {
+	return x_thread_id;
+}
 void x_delay(unsigned int time) {
 	if (time > MAX_DELAY) time = MAX_DELAY;
 	cli();
@@ -178,7 +181,7 @@ void x_suspend(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	suspend |= bit2mask8(ID);
 	sei();
 
 	// return to caller.
@@ -188,7 +191,7 @@ void x_resume(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	suspend &= ~bit2mask8(ID);
 	sei();
 
 	// return to caller.
@@ -198,7 +201,7 @@ void x_disable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	disable |= bit2mask8(ID);
 	sei();
 
 	// return to caller.
@@ -208,7 +211,7 @@ void x_enable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	disable &= ~bit2mask8(ID);
 	sei();
 
 	// return to caller.
@@ -244,9 +247,9 @@ void setTimer() {
 	PRR0 = 0x00;
 	TCNT1 = 0;
 
-	// period 333.33 ms, on-time = 75 ms
-	int TOP1 = 63;//16144; // OFFTIME
-	int TOP2 = 63;//4688;  // ONTIME
+	// period 333.33 ms @ 16144, on-time = 75 ms @ 4688
+	int TOP1 = 63; // OFFTIME - 1 ms
+	int TOP2 = 63;// ONTIME - 1 ms
 
 	cli();
 	TCCR1A = 0x00;

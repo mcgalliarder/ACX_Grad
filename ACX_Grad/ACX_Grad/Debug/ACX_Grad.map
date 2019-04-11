@@ -37,15 +37,16 @@ Discarded input sections
  .text          0x00000000        0x0 acx.o
  .data          0x00000000        0x0 acx.o
  .bss           0x00000000        0x0 acx.o
+ .text.x_getID  0x00000000        0x6 acx.o
  .text.x_gtime  0x00000000        0xe acx.o
  .text.x_suspend
-                0x00000000        0x6 acx.o
+                0x00000000       0x14 acx.o
  .text.x_resume
-                0x00000000        0x6 acx.o
+                0x00000000       0x16 acx.o
  .text.x_disable
-                0x00000000        0x6 acx.o
+                0x00000000       0x14 acx.o
  .text.x_enable
-                0x00000000        0x6 acx.o
+                0x00000000       0x16 acx.o
  .data          0x00000000        0x0 acx_asm.o
  .bss           0x00000000        0x0 acx_asm.o
  .text          0x00000000        0x0 main.o
@@ -569,55 +570,55 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000       0xd0
+.debug_aranges  0x00000000       0xd8
  *(.debug_aranges)
  .debug_aranges
-                0x00000000       0x80 acx.o
+                0x00000000       0x88 acx.o
  .debug_aranges
-                0x00000080       0x20 acx_asm.o
+                0x00000088       0x20 acx_asm.o
  .debug_aranges
-                0x000000a0       0x30 main.o
+                0x000000a8       0x30 main.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x14a6
+.debug_info     0x00000000     0x150b
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0xbbc C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_info    0x00000bbc      0x6e0 acx.o
- .debug_info    0x0000129c       0x7d acx_asm.o
- .debug_info    0x00001319      0x18d main.o
+ .debug_info    0x00000bbc      0x745 acx.o
+ .debug_info    0x00001301       0x7d acx_asm.o
+ .debug_info    0x0000137e      0x18d main.o
 
-.debug_abbrev   0x00000000      0xecb
+.debug_abbrev   0x00000000      0xec7
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0xb1a C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_abbrev  0x00000b1a      0x2e7 acx.o
- .debug_abbrev  0x00000e01       0x14 acx_asm.o
- .debug_abbrev  0x00000e15       0xb6 main.o
+ .debug_abbrev  0x00000b1a      0x2e3 acx.o
+ .debug_abbrev  0x00000dfd       0x14 acx_asm.o
+ .debug_abbrev  0x00000e11       0xb6 main.o
 
-.debug_line     0x00000000      0xa18
+.debug_line     0x00000000      0xa47
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1f9 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_line    0x000001f9      0x493 acx.o
- .debug_line    0x0000068c      0x27c acx_asm.o
- .debug_line    0x00000908      0x110 main.o
+ .debug_line    0x000001f9      0x4c2 acx.o
+ .debug_line    0x000006bb      0x27c acx_asm.o
+ .debug_line    0x00000937      0x110 main.o
 
-.debug_frame    0x00000000      0x1b0
+.debug_frame    0x00000000      0x1c0
  *(.debug_frame)
- .debug_frame   0x00000000      0x16c acx.o
- .debug_frame   0x0000016c       0x44 main.o
+ .debug_frame   0x00000000      0x17c acx.o
+ .debug_frame   0x0000017c       0x44 main.o
 
-.debug_str      0x00000000      0x6f4
+.debug_str      0x00000000      0x6fc
  *(.debug_str)
  .debug_str     0x00000000      0x3e6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
- .debug_str     0x000003e6      0x2e3 acx.o
-                                0x345 (size before relaxing)
- .debug_str     0x000006c9       0x2b main.o
+ .debug_str     0x000003e6      0x2eb acx.o
+                                0x34d (size before relaxing)
+ .debug_str     0x000006d1       0x2b main.o
                                 0x1c1 (size before relaxing)
 
-.debug_loc      0x00000000      0x5e8
+.debug_loc      0x00000000      0x66c
  *(.debug_loc)
- .debug_loc     0x00000000      0x5e8 acx.o
+ .debug_loc     0x00000000      0x66c acx.o
 
 .debug_macinfo
  *(.debug_macinfo)
@@ -637,10 +638,10 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000       0x90
+.debug_ranges   0x00000000       0x98
  *(.debug_ranges)
- .debug_ranges  0x00000000       0x70 acx.o
- .debug_ranges  0x00000070       0x20 main.o
+ .debug_ranges  0x00000000       0x78 acx.o
+ .debug_ranges  0x00000078       0x20 main.o
 
 .debug_macro
  *(.debug_macro)

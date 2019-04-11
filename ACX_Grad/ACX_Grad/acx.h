@@ -98,6 +98,8 @@ typedef uint8_t byte;
 // macro to access the current thread id
 #define getTID() x_thread_id
 
+//macro to return value of 4-byte tick counter
+#define getTime() 
 
 //---------------------------------------------------------------------------
 // PTHREAD is a type that represents how threads are called--
