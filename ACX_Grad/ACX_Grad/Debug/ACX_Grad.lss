@@ -3,31 +3,31 @@ ACX_Grad.elf:     file format elf32-avr
 
 Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
-  0 .data         00000020  00800200  00000562  000005f6  2**0
+  0 .data         00000020  00800200  00000574  00000608  2**0
                   CONTENTS, ALLOC, LOAD, DATA
-  1 .text         00000562  00000000  00000000  00000094  2**1
+  1 .text         00000574  00000000  00000000  00000094  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  2 .bss          00000815  00800220  00800220  00000616  2**0
+  2 .bss          00000815  00800220  00800220  00000628  2**0
                   ALLOC
-  3 .comment      00000030  00000000  00000000  00000616  2**0
+  3 .comment      00000030  00000000  00000000  00000628  2**0
                   CONTENTS, READONLY
-  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000648  2**2
+  4 .note.gnu.avr.deviceinfo 00000040  00000000  00000000  00000658  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000000d8  00000000  00000000  00000688  2**3
+  5 .debug_aranges 000000d0  00000000  00000000  00000698  2**3
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   0000150b  00000000  00000000  00000760  2**0
+  6 .debug_info   000015c3  00000000  00000000  00000768  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000ec7  00000000  00000000  00001c6b  2**0
+  7 .debug_abbrev 00000f0b  00000000  00000000  00001d2b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00000a47  00000000  00000000  00002b32  2**0
+  8 .debug_line   00000a55  00000000  00000000  00002c36  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  000001c0  00000000  00000000  0000357c  2**2
+  9 .debug_frame  000001b0  00000000  00000000  0000368c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    000006fc  00000000  00000000  0000373c  2**0
+ 10 .debug_str    00000701  00000000  00000000  0000383c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    0000066c  00000000  00000000  00003e38  2**0
+ 11 .debug_loc    0000066c  00000000  00000000  00003f3d  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000098  00000000  00000000  000044a4  2**0
+ 12 .debug_ranges 00000090  00000000  00000000  000045a9  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -162,7 +162,7 @@ Disassembly of section .text:
   f4:	12 e0       	ldi	r17, 0x02	; 2
   f6:	a0 e0       	ldi	r26, 0x00	; 0
   f8:	b2 e0       	ldi	r27, 0x02	; 2
-  fa:	e2 e6       	ldi	r30, 0x62	; 98
+  fa:	e4 e7       	ldi	r30, 0x74	; 116
   fc:	f5 e0       	ldi	r31, 0x05	; 5
   fe:	00 e0       	ldi	r16, 0x00	; 0
  100:	0b bf       	out	0x3b, r16	; 59
@@ -186,8 +186,8 @@ Disassembly of section .text:
  118:	a5 33       	cpi	r26, 0x35	; 53
  11a:	b2 07       	cpc	r27, r18
  11c:	e1 f7       	brne	.-8      	; 0x116 <.do_clear_bss_loop>
- 11e:	0f d2       	rcall	.+1054   	; 0x53e <main>
- 120:	1e c2       	rjmp	.+1084   	; 0x55e <_exit>
+ 11e:	11 d2       	rcall	.+1058   	; 0x542 <main>
+ 120:	27 c2       	rjmp	.+1102   	; 0x570 <_exit>
 
 00000122 <__bad_interrupt>:
  122:	6e cf       	rjmp	.-292    	; 0x0 <__vectors>
@@ -811,7 +811,7 @@ void setTimer() {
 
 	// period 333.33 ms @ 16144, on-time = 75 ms @ 4688
 	int TOP1 = 63; // OFFTIME - 1 ms
-	int TOP2 = 63;// ONTIME - 1 ms
+	int TOP2 = 63;//63;// ONTIME - 1 ms
 
 	cli();
  428:	f8 94       	cli
@@ -989,70 +989,79 @@ ISR(TIMER1_COMPA_vect){
  520:	18 95       	reti
 
 00000522 <thread0Blink>:
-// A test thread
-//------------------------
-void thread0Blink(void)
 {
    while(1){
-     x_delay(1500);
- 522:	8c ed       	ldi	r24, 0xDC	; 220
- 524:	95 e0       	ldi	r25, 0x05	; 5
- 526:	c1 de       	rcall	.-638    	; 0x2aa <x_delay>
-	 //blink the LED
-	 PORTB ^= 0x80;
- 528:	85 b1       	in	r24, 0x05	; 5
- 52a:	80 58       	subi	r24, 0x80	; 128
- 52c:	85 b9       	out	0x05, r24	; 5
- 52e:	f9 cf       	rjmp	.-14     	; 0x522 <thread0Blink>
+	 //PORTF &= 0x80;
+	 //PORTF |= (shiftCounter++) % 3;
+	 //PORTF |= 0x80;
+	 PORTF ^= 1 << 1;
+ 522:	c2 e0       	ldi	r28, 0x02	; 2
+ 524:	81 b3       	in	r24, 0x11	; 17
+ 526:	8c 27       	eor	r24, r28
+ 528:	81 bb       	out	0x11, r24	; 17
+     x_delay(50000);
+ 52a:	80 e5       	ldi	r24, 0x50	; 80
+ 52c:	93 ec       	ldi	r25, 0xC3	; 195
+ 52e:	bd de       	rcall	.-646    	; 0x2aa <x_delay>
+ 530:	f9 cf       	rjmp	.-14     	; 0x524 <thread0Blink+0x2>
 
-00000530 <thread1Blink>:
-   }
-}
-
+00000532 <thread1Blink>:
 void thread1Blink(void) {
 	while(1) {
-	  x_delay(500);
- 530:	84 ef       	ldi	r24, 0xF4	; 244
- 532:	91 e0       	ldi	r25, 0x01	; 1
- 534:	ba de       	rcall	.-652    	; 0x2aa <x_delay>
-	  //blink the LED
-	  PORTB ^= 0x80;
- 536:	85 b1       	in	r24, 0x05	; 5
- 538:	80 58       	subi	r24, 0x80	; 128
- 53a:	85 b9       	out	0x05, r24	; 5
- 53c:	f9 cf       	rjmp	.-14     	; 0x530 <thread1Blink>
+	  //PORTF &= 0xFD;
+	  //PORTF &= 0x80;
+	  //PORTF |= (shiftCounter++) % 2;
+	  PORTF ^= 1 << 2;
+ 532:	c4 e0       	ldi	r28, 0x04	; 4
+ 534:	81 b3       	in	r24, 0x11	; 17
+ 536:	8c 27       	eor	r24, r28
+ 538:	81 bb       	out	0x11, r24	; 17
+	  x_delay(50000);
+ 53a:	80 e5       	ldi	r24, 0x50	; 80
+ 53c:	93 ec       	ldi	r25, 0xC3	; 195
+ 53e:	b5 de       	rcall	.-662    	; 0x2aa <x_delay>
+ 540:	f9 cf       	rjmp	.-14     	; 0x534 <thread1Blink+0x2>
 
-0000053e <main>:
-void thread0Blink(void);
+00000542 <main>:
 void thread1Blink(void);
+int shiftCounter = 0;
 
 int main(void)
 {
    DDRB = 0x80;
- 53e:	80 e8       	ldi	r24, 0x80	; 128
- 540:	84 b9       	out	0x04, r24	; 4
+ 542:	80 e8       	ldi	r24, 0x80	; 128
+ 544:	84 b9       	out	0x04, r24	; 4
    PORTB |= 0x80;
- 542:	2f 9a       	sbi	0x05, 7	; 5
+ 546:	2f 9a       	sbi	0x05, 7	; 5
+   DDRF |= (1<<DDF1)|(1<<DDF0);
+ 548:	80 b3       	in	r24, 0x10	; 16
+ 54a:	83 60       	ori	r24, 0x03	; 3
+ 54c:	80 bb       	out	0x10, r24	; 16
+   PORTF = !(PORTF & 0x01);
+ 54e:	81 b3       	in	r24, 0x11	; 17
+ 550:	80 95       	com	r24
+ 552:	81 70       	andi	r24, 0x01	; 1
+ 554:	81 bb       	out	0x11, r24	; 17
    x_init();
- 544:	82 de       	rcall	.-764    	; 0x24a <x_init>
+ 556:	79 de       	rcall	.-782    	; 0x24a <x_init>
    setTimer();
- 546:	6a df       	rcall	.-300    	; 0x41c <setTimer>
- 548:	41 e0       	ldi	r20, 0x01	; 1
+ 558:	61 df       	rcall	.-318    	; 0x41c <setTimer>
+ 55a:	41 e0       	ldi	r20, 0x01	; 1
    x_new(0, thread0Blink, true); 
- 54a:	61 e9       	ldi	r22, 0x91	; 145
- 54c:	72 e0       	ldi	r23, 0x02	; 2
- 54e:	80 e0       	ldi	r24, 0x00	; 0
- 550:	c1 de       	rcall	.-638    	; 0x2d4 <x_new>
- 552:	41 e0       	ldi	r20, 0x01	; 1
+ 55c:	61 e9       	ldi	r22, 0x91	; 145
+ 55e:	72 e0       	ldi	r23, 0x02	; 2
+ 560:	80 e0       	ldi	r24, 0x00	; 0
+ 562:	b8 de       	rcall	.-656    	; 0x2d4 <x_new>
+ 564:	41 e0       	ldi	r20, 0x01	; 1
    x_new(1, thread1Blink, true);  
- 554:	68 e9       	ldi	r22, 0x98	; 152
- 556:	72 e0       	ldi	r23, 0x02	; 2
- 558:	81 e0       	ldi	r24, 0x01	; 1
- 55a:	bc de       	rcall	.-648    	; 0x2d4 <x_new>
- 55c:	ff cf       	rjmp	.-2      	; 0x55c <main+0x1e>
+ 566:	69 e9       	ldi	r22, 0x99	; 153
+ 568:	72 e0       	ldi	r23, 0x02	; 2
+ 56a:	81 e0       	ldi	r24, 0x01	; 1
+ 56c:	b3 de       	rcall	.-666    	; 0x2d4 <x_new>
+ 56e:	ff cf       	rjmp	.-2      	; 0x56e <main+0x2c>
 
-0000055e <_exit>:
- 55e:	f8 94       	cli
+00000570 <_exit>:
+ 570:	f8 94       	cli
 
-00000560 <__stop_program>:
- 560:	ff cf       	rjmp	.-2      	; 0x560 <__stop_program>
+00000572 <__stop_program>:
+ 572:	ff cf       	rjmp	.-2      	; 0x572 <__stop_program>

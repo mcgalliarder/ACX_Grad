@@ -30,7 +30,7 @@
 #include <stdbool.h>
 #include "acx.h"
 
-
+/*
 byte disable;
 byte suspend;
 byte delay;
@@ -39,7 +39,7 @@ volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay coun
 byte x_thread_id;
 byte x_thread_mask;
 byte mem[STACK_MEM_SIZE];
-
+*/
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
 											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
 											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS+ (int) mem},
@@ -112,11 +112,9 @@ void x_init(void)
 	// return to caller.
 }
 
-uint8_t x_getID() {
-	return x_thread_id;
-}
 void x_delay(unsigned int time) {
 	if (time > MAX_DELAY) time = MAX_DELAY;
+	if (time < 0) time = 0; // shouldn't ever happen
 	cli();
     
 	// copy delay value into calling thread's counter
@@ -130,18 +128,6 @@ void x_delay(unsigned int time) {
 	sei();
 	// return to caller.
 }
-
-unsigned long x_gtime() {
-	cli();
-
-	// Your initialization code here
-
-	sei();
-
-	// return to caller.
-	return 1L;
-}
-
 
 /*
  * x_new initializes a new thread in the system
@@ -175,6 +161,12 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	sei();
 
 	// return to caller.
+}
+
+unsigned long x_gtime() {
+	
+	return x_thread_delay[x_thread_id];
+
 }
 
 void x_suspend(uint8_t ID) {
@@ -249,7 +241,7 @@ void setTimer() {
 
 	// period 333.33 ms @ 16144, on-time = 75 ms @ 4688
 	int TOP1 = 63; // OFFTIME - 1 ms
-	int TOP2 = 63;// ONTIME - 1 ms
+	int TOP2 = 63;//63;// ONTIME - 1 ms
 
 	cli();
 	TCCR1A = 0x00;

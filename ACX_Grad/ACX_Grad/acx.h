@@ -93,13 +93,15 @@
 typedef uint8_t byte;
 #endif
 
-
+byte x_thread_id;
+byte x_thread_mask;
+volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
 
 // macro to access the current thread id
-#define getTID() x_thread_id
+#define x_getID() x_thread_id
 
 //macro to return value of 4-byte tick counter
-#define getTime() 
+//#define x_gtime() x_thread_delay[x_thread_id]
 
 //---------------------------------------------------------------------------
 // PTHREAD is a type that represents how threads are called--
@@ -145,6 +147,11 @@ void            kernalInit(void);
 void            placeCanaries(void);
 void			x_stack_overflow(void);
 void			setTimer(void);
+
+byte disable;
+byte suspend;
+byte delay;
+byte mem[STACK_MEM_SIZE];
 
 #endif
 
