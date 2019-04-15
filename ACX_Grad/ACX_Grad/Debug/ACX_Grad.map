@@ -292,7 +292,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0x560
+.text           0x00000000      0x564
  *(.vectors)
  .vectors       0x00000000       0xe4 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
                 0x00000000                __vector_default
@@ -407,46 +407,46 @@ END GROUP
                 0x00000122                __vector_18
                 0x00000122                __vector_20
                 0x00000122                __vector_42
- .text          0x00000124       0xce acx_asm.o
+ .text          0x00000124       0xd2 acx_asm.o
                 0x00000124                x_yield
                 0x00000178                x_schedule
-                0x000001de                bit2mask8
-                0x000001f2                . = ALIGN (0x2)
+                0x000001e2                bit2mask8
+                0x000001f6                . = ALIGN (0x2)
  *(.text.*)
  .text.kernalInit
-                0x000001f2       0x34 acx.o
-                0x000001f2                kernalInit
+                0x000001f6       0x34 acx.o
+                0x000001f6                kernalInit
  .text.placeCanaries
-                0x00000226       0x24 acx.o
-                0x00000226                placeCanaries
- .text.x_init   0x0000024a       0x60 acx.o
-                0x0000024a                x_init
- .text.x_delay  0x000002aa       0x2a acx.o
-                0x000002aa                x_delay
- .text.x_new    0x000002d4       0x90 acx.o
-                0x000002d4                x_new
+                0x0000022a       0x24 acx.o
+                0x0000022a                placeCanaries
+ .text.x_init   0x0000024e       0x60 acx.o
+                0x0000024e                x_init
+ .text.x_delay  0x000002ae       0x2a acx.o
+                0x000002ae                x_delay
+ .text.x_new    0x000002d8       0x90 acx.o
+                0x000002d8                x_new
  .text.x_stack_overflow
-                0x00000364       0xb8 acx.o
-                0x00000364                x_stack_overflow
+                0x00000368       0xb8 acx.o
+                0x00000368                x_stack_overflow
  .text.setTimer
-                0x0000041c       0x56 acx.o
-                0x0000041c                setTimer
+                0x00000420       0x56 acx.o
+                0x00000420                setTimer
  .text.__vector_17
-                0x00000472       0xae acx.o
-                0x00000472                __vector_17
+                0x00000476       0xae acx.o
+                0x00000476                __vector_17
  .text.thread0Blink
-                0x00000520        0x8 main.o
-                0x00000520                thread0Blink
+                0x00000524        0x8 main.o
+                0x00000524                thread0Blink
  .text.thread1Blink
-                0x00000528        0x8 main.o
-                0x00000528                thread1Blink
- .text.main     0x00000530       0x2c main.o
-                0x00000530                main
-                0x0000055c                . = ALIGN (0x2)
+                0x0000052c        0x8 main.o
+                0x0000052c                thread1Blink
+ .text.main     0x00000534       0x2c main.o
+                0x00000534                main
+                0x00000560                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x0000055c        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
-                0x0000055c                _exit
-                0x0000055c                exit
+ .fini9         0x00000560        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
+                0x00000560                _exit
+                0x00000560                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -465,11 +465,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x0000055c        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
+ .fini0         0x00000560        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr6\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000560                _etext = .
+                0x00000564                _etext = .
 
-.data           0x00800200       0x20 load address 0x00000560
+.data           0x00800200       0x20 load address 0x00000564
                 0x00800200                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -498,8 +498,8 @@ END GROUP
                 0x00800a24                x_thread_delay
                 0x00800a34                x_thread_mask
                 0x00800a35                PROVIDE (__bss_end, .)
-                0x00000560                __data_load_start = LOADADDR (.data)
-                0x00000580                __data_load_end = (__data_load_start + SIZEOF (.data))
+                0x00000564                __data_load_start = LOADADDR (.data)
+                0x00000584                __data_load_end = (__data_load_start + SIZEOF (.data))
 
 .noinit         0x00800a35        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
@@ -597,12 +597,12 @@ END GROUP
  .debug_abbrev  0x00000dfd       0x14 acx_asm.o
  .debug_abbrev  0x00000e11       0xfa main.o
 
-.debug_line     0x00000000      0xa30
+.debug_line     0x00000000      0xa36
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x1f9 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.209/gcc/dev/atmega2560/avr6/crtatmega2560.o
  .debug_line    0x000001f9      0x4a4 acx.o
- .debug_line    0x0000069d      0x27c acx_asm.o
- .debug_line    0x00000919      0x117 main.o
+ .debug_line    0x0000069d      0x282 acx_asm.o
+ .debug_line    0x0000091f      0x117 main.o
 
 .debug_frame    0x00000000      0x1b8
  *(.debug_frame)
