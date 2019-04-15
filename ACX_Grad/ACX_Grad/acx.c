@@ -2,7 +2,7 @@
  * acx.c
  *
  * Created: 3/26/2019 12:34:55 PM
- *  Author: Andrew Thorp
+ * Author: Andrew Thorp thorpah
  * Author: Eli McGalliard mcgalliarder
  *
  *       **************************************************
