@@ -30,16 +30,7 @@
 #include <stdbool.h>
 #include "acx.h"
 
-/*
-byte disable;
-byte suspend;
-byte delay;
-//unsigned int delayCounters[MAX_DELAY];
-volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
-byte x_thread_id;
-byte x_thread_mask;
-byte mem[STACK_MEM_SIZE];
-*/
+
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
 											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
 											   {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS+ (int) mem},
@@ -282,11 +273,11 @@ ISR(TIMER1_COMPA_vect){
 		if (x_thread_delay[i] && delayStatus) { 
 			
 			// decrement count
-			x_thread_delay[x_thread_id]--;
+			x_thread_delay[i]--;
 			
 			//if counter is now zero then clear delay bit
-			if (!x_thread_delay[x_thread_id])
-				delay &= ~(bit2mask8(x_thread_id));
+			if (!x_thread_delay[i])
+				delay &= ~(bit2mask8(i));
 		}
 	}
 }
