@@ -93,18 +93,18 @@ void x_init(void)
 
     // create a PTUnion and save the return address
     volatile PTUnion ret;
-    ret.addr[0] = * (stackP + 10);
+    ret.addr[0] = * (stackP + 8);
     ret.addr[1] = * (stackP + 9);
-    ret.addr[2] = * (stackP + 8);
+    ret.addr[2] = * (stackP + 10);
 
     // change the stack pointer to the bottom of T0
     SP = (int) (mem + T0_STACK_BASE_OFFS);
 
     // push the old return address onto the new stack
 	int stackpointer = SP - (int) mem;
-	mem[stackpointer--] = ret.addr[0];
-	mem[stackpointer--] = ret.addr[1];
 	mem[stackpointer--] = ret.addr[2];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[0];
 	SP = SP - 10;
 	
 	asm("sei");
@@ -145,18 +145,15 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	x_thread_id = ID;
 	x_thread_mask = bit2mask8(ID);
 	volatile PTUnion ret;
-	ret.addr[2] = 0;
-	ret.addr[1] = 0;
-	ret.addr[0] = 0;
 	ret.pthread = thread;
 	
 	int stackpointer = stackControlTable[ID].spBase - (int) mem;
 	
-	mem[stackpointer--] = ret.addr[0];
-	mem[stackpointer--] = ret.addr[1];
 	mem[stackpointer--] = ret.addr[2];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[0];
 	
-	stackControlTable[ID].sp = stackControlTable[ID].spBase - 22; //18
+	stackControlTable[ID].sp = stackControlTable[ID].spBase - 21; //18
 	
 	char disablebit = enable << ID;
 	disable = (enable) ? disable & ~disablebit : disable | disablebit ;
