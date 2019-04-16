@@ -30,7 +30,7 @@
 #include <stdbool.h>
 #include "acx.h"
 
-unsigned long x_gtime = 0;
+unsigned long x_gTime = 0;
 
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
 											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
@@ -136,6 +136,7 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
 	x_thread_id = ID;
+	x_thread_mask = bit2mask8(ID);
 	volatile PTUnion ret;
 	ret.addr[2] = 0;
 	ret.addr[1] = 0;
@@ -160,7 +161,7 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 
 unsigned long x_gtime() {
 	
-	return x_gtime;
+	return x_gTime;
 
 }
 
@@ -168,7 +169,9 @@ void x_suspend(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-	suspend |= bit2mask8(ID);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		suspend |= bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -178,7 +181,9 @@ void x_resume(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-	suspend &= ~bit2mask8(ID);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		suspend &= ~bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -188,7 +193,9 @@ void x_disable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-	disable |= bit2mask8(ID);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		disable |= bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -198,7 +205,9 @@ void x_enable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-	disable &= ~bit2mask8(ID);
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		disable &= ~bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -258,17 +267,11 @@ void setTimer() {
 	// enable timer compare interrupt:
 	TIMSK1 |= (1 << OCIE1A);
 	sei();          // enable global interrupts
-
-	// setup initial output state
-	DDRB = 0x80;
-	PORTB |= 0x80;
 }
 
 ISR(TIMER1_COMPA_vect){
 	
-	x_gtime++;
-	//decrement x_thread_id's timer	
-	//ATOMIC_BLOCK; // Need to unblock somehow afterwards?
+	x_gTime++;
 	
 	//check x_delay_thread for every thread
 	for(int i = 0; i < MAXTHREADS; i++) {
@@ -281,7 +284,7 @@ ISR(TIMER1_COMPA_vect){
 			
 			// decrement threads count
 			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
-				x_thread_delay[x_thread_id]--;
+				x_thread_delay[i]--;
 			}
 			
 			//if counter is now zero then clear delay bit
