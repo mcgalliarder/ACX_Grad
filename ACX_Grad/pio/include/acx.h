@@ -2,8 +2,12 @@
  * acx.h
  *
  * Created: 3/26/2019
+<<<<<<< HEAD
  * Author: Andrew Thorp thorpah
  * Author: Eli McGalliard mcgalliarder
+=======
+ * Author: Andrew Thorp
+>>>>>>> master
  * 
  *       **************************************************
  *       **************************************************
@@ -15,7 +19,10 @@
  *       **    |_| |_| |_.__/  /_/    \_\_____/_/ \_\    **
  *       **                                              **
  *       **                                 Andrew Thorp **
+<<<<<<< HEAD
  *       **                               Eli McGalliard **
+=======
+>>>>>>> master
  *       **************************************************
  *       **************************************************
  *
@@ -31,7 +38,11 @@
 #define MAX_DELAY 1024
 
 // includes max number of threads and number used
+<<<<<<< HEAD
 #define CANARY 0xAA
+=======
+#define CANARY 0xAA;
+>>>>>>> master
 
 #define MAXTHREADS 8
 #define THREADSUSED 8
@@ -131,6 +142,7 @@ typedef struct ctrl {
     int spBase;
 } stackControl;
 
+<<<<<<< HEAD
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS + (int) mem},
                                                {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS + (int) mem},
                                                {T2_STACK_BASE_OFFS + (int) mem, T2_STACK_BASE_OFFS + (int) mem},
@@ -140,6 +152,8 @@ stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, 
                                                {T6_STACK_BASE_OFFS + (int) mem, T6_STACK_BASE_OFFS + (int) mem},
                                                {T7_STACK_BASE_OFFS + (int) mem, T7_STACK_BASE_OFFS + (int) mem}};
 
+=======
+>>>>>>> master
 //----------------------------------------------------------------------------
 // ACX Function prototypes
 //----------------------------------------------------------------------------

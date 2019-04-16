@@ -2,22 +2,37 @@
 /*
  * acx_asm.S
  *
+<<<<<<< HEAD
  *  Created: 3/28/2019
  *  Author: Andrew Thorp thorpah
  *  Author: Eli McGalliard mcgalliarder 
+=======
+ * Created: 
+ *  Author: Andrew Thorp:  thorpah
+ *  Author: Eli McGalliard: 
+>>>>>>> master
  */
 
  #define __SFR_OFFSET 0
  #include <avr/io.h>
+<<<<<<< HEAD
  #include "acx.h"
 
 		.section .text
+=======
+  #include "acx.h"
+
+
+		.section .text
+		
+>>>>>>> master
 		.global x_yield
 x_yield:
 ;------------------------------------------------------------------------
 ; Save thread context
 ;-------------------------------------------------------------------------
 
+<<<<<<< HEAD
     ; Save registers for calling thread
 	push r2 // Save and restore callee-save registers
 	push r3 // Push onto calling thread's stack
@@ -95,6 +110,11 @@ x_yield:
 
 	ret
 	
+=======
+; your code here...
+
+
+>>>>>>> master
 ;------------------------------------------------------------------------
 ; Schedule next thread -- must use caller save registers below here
 ;                         because we can reach this without saving regs
@@ -127,6 +147,7 @@ restore:
 //  Returns:       mask - a bit mask having a single bit set corresponding to input ID
 //						  (interpreted as bit number)
 //-----------------------------------------------------------------------------------------------
+<<<<<<< HEAD
 
 		.global bit2mask8
 bit2mask8:
@@ -159,3 +180,11 @@ none:
 finished:
 		ret
 
+=======
+		.global bit2mask8
+bit2mask8:
+		;r24 containts thread ID input
+		
+		
+		ret
+>>>>>>> master
