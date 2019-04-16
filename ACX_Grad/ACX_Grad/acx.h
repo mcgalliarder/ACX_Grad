@@ -28,7 +28,7 @@
 
 // C and Assembly definitions
 
-#define MAX_DELAY 1024
+#define MAX_DELAY 65535 //1024
 
 // includes max number of threads and number used
 #define CANARY 0xAA;	// If this is changed, change it in the canary check in X_yield as well
@@ -93,11 +93,11 @@
 typedef uint8_t byte;
 #endif
 
-
-
 // macro to access the current thread id
-#define getTID() x_thread_id
+#define x_getID() x_thread_id
 
+//macro to return value of 4-byte tick counter
+//#define x_gtime() x_thread_delay[x_thread_id]
 
 //---------------------------------------------------------------------------
 // PTHREAD is a type that represents how threads are called--
@@ -112,7 +112,7 @@ typedef void (*PTHREAD)(void);
 //---------------------------------------------------------------------------
 
 typedef union {
- 	//PTHREAD pthread;
+ 	PTHREAD pthread;
  	byte addr[3];
 } PTUnion;
 
@@ -142,7 +142,7 @@ void            x_enable(uint8_t);
 void            kernalInit(void);
 void            placeCanaries(void);
 void			x_stack_overflow(void);
-
+void			setTimer();
 
 #endif
 
