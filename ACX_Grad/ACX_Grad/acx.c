@@ -30,6 +30,7 @@
 #include <stdbool.h>
 #include "acx.h"
 
+unsigned long x_gtime = 0;
 
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
 											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
@@ -109,7 +110,9 @@ void x_delay(unsigned int time) {
 	cli();
     
 	// copy delay value into calling thread's counter
-	x_thread_delay[x_thread_id] = time;
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		x_thread_delay[x_thread_id] = time;	
+	}
 	
 	// set x_delay_status bit corresponding to thread's id 
 	delay |= bit2mask8(x_thread_id); 
@@ -157,7 +160,7 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 
 unsigned long x_gtime() {
 	
-	return x_thread_delay[x_thread_id];
+	return x_gtime;
 
 }
 
@@ -262,6 +265,8 @@ void setTimer() {
 }
 
 ISR(TIMER1_COMPA_vect){
+	
+	x_gtime++;
 	//decrement x_thread_id's timer	
 	//ATOMIC_BLOCK; // Need to unblock somehow afterwards?
 	
@@ -275,7 +280,9 @@ ISR(TIMER1_COMPA_vect){
 		if (x_thread_delay[i] && delayStatus) { 
 			
 			// decrement threads count
-			x_thread_delay[i]--;
+			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+				x_thread_delay[x_thread_id]--;
+			}
 			
 			//if counter is now zero then clear delay bit
 			if (!x_thread_delay[i])
