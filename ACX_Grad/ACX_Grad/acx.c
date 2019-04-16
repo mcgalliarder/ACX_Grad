@@ -132,6 +132,7 @@ void x_delay(unsigned int time) {
 void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
+	x_thread_id = ID;
 	volatile PTUnion ret;
 	ret.addr[2] = 0;
 	ret.addr[1] = 0;
@@ -266,13 +267,14 @@ ISR(TIMER1_COMPA_vect){
 	
 	//check x_delay_thread for every thread
 	for(int i = 0; i < MAXTHREADS; i++) {
+		
 		// check if thread is currently delayed
 		int delayStatus = bit2mask8(i) & delay; 
 		
 		//if the delay status is not zero and the count isn't zero
 		if (x_thread_delay[i] && delayStatus) { 
 			
-			// decrement count
+			// decrement threads count
 			x_thread_delay[i]--;
 			
 			//if counter is now zero then clear delay bit
