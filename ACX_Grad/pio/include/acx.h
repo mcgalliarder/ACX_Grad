@@ -31,7 +31,7 @@
 #define MAX_DELAY 1024
 
 // includes max number of threads and number used
-#define CANARY 0xAA;
+#define CANARY 0xAA
 
 #define MAXTHREADS 8
 #define THREADSUSED 8

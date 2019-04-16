@@ -1,0 +1,60 @@
+15,18d14
+< 
+< 
+< //lookup: .db 1, 2, 4, 8, 16, 32, 64, 128
+< 		
+44c40,53
+< 	ldi r16, getTID()
+---
+>     ;---------------------------
+> 
+>  	lds r30, x_thread_id        ; get stack ID
+>  	ldi r31, 0
+> 
+>  	lsl r30                     ; get stack control table offset
+>  	rol r31
+>  	lsl r30
+>  	rol r31
+>  	subi r30, lo8(-(stackControlTable)) ; get stack pointer address from table
+>  	subi r31, hi8(-(stackControlTable))
+> 
+>     st Z, SP                            ; store stack pointer in stackControlTable
+>  	
+46,49c55
+< 	mov r20, r16 
+< 	mul r20, T0_STACK_SIZE
+< 	ldi r30, lo8(mem)
+< 	ldi r31, hi8(mem)
+---
+>     ;---------------------------
+51,52c57,62
+< 	; threadid * stacksize for canary
+< 	
+---
+> 
+>  	
+>  	ldi r30, lo8(mem)           ; Init Z pointer to &mem
+>  	ldi r31, hi8(mem)
+>  	
+>  	
+53a64,65
+>  	; threadID * stacksize for canary
+>     ;---------------------------
+55a68
+>     ;---------------------------
+57a71
+>     ;---------------------------
+63a78
+>     ;---------------------------
+120d134
+< 		/*
+122a137
+> 		/*
+125,126c140
+< 		*/
+< 		adc r24, 1
+---
+> 
+127a142,143
+> 		*/
+>  		adc r24, 1
