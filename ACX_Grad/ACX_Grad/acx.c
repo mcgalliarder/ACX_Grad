@@ -30,6 +30,13 @@
 #include <stdbool.h>
 #include "acx.h"
 
+byte disable;
+byte suspend;
+byte delay;
+byte mem[STACK_MEM_SIZE];
+byte x_thread_id;
+byte x_thread_mask;
+volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
 unsigned long x_gTime = 0;
 
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},

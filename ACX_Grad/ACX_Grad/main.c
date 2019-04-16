@@ -12,14 +12,20 @@
 #include "PSerial.h"
 #include "acx.h"
 
-
-void thread0Blink();
-void thread1Blink();
+void thread0Blink(void);
+void thread1Blink(void);
+void testThread(void);
 
 int shiftCounter = 0;
 
 int main(void)
 {
+   volatile int j = 0;
+   x_init();
+   x_new(1, testThread, true);  // create thread, ID=1
+// x_new(0, testThread, true);  // replace current thread
+
+	/*
    DDRB = 0x80;
    PORTB |= 0x80;
    DDRF |= (1<<DDF1)|(1<<DDF0);
@@ -28,8 +34,22 @@ int main(void)
    x_new(0, thread0Blink, true); 
    x_new(1, thread1Blink, true);  
    PORTF |= 0x03;
+   while(1) {
+	      
+   }
+   */
    while(1){
-	
+	 j++;
+	 x_yield();
+   }
+}
+
+void testThread(void)
+{
+   volatile int i = 0;
+   while(1){
+      i++;
+      x_yield();
    }
 }
 
