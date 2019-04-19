@@ -4,3 +4,6 @@
 *.lss
 *.mao
 *.srec
+*.d
+*.eep
+

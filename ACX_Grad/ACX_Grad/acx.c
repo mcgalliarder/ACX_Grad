@@ -142,18 +142,25 @@ void x_delay(unsigned int time) {
 void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
-	x_thread_id = ID;
-	x_thread_mask = bit2mask8(ID);
+	//x_thread_id = ID;
+	//x_thread_mask |= bit2mask8(ID);
 	volatile PTUnion ret;
+	ret.addr[0] = 0;
+	ret.addr[1] = 0;
+	ret.addr[2] = 0;
+	
 	ret.pthread = thread;
 	
 	int stackpointer = stackControlTable[ID].spBase - (int) mem;
 	
-	mem[stackpointer--] = ret.addr[2];
-	mem[stackpointer--] = ret.addr[1];
+	// since the int is stored in Little Endian,
+	// you have to reverse it here so the return address
+	// is big endian in memory.
 	mem[stackpointer--] = ret.addr[0];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[2];
 	
-	stackControlTable[ID].sp = stackControlTable[ID].spBase - 21; //18
+	stackControlTable[ID].sp = stackControlTable[ID].spBase - 22; //18
 	
 	char disablebit = enable << ID;
 	disable = (enable) ? disable & ~disablebit : disable | disablebit ;
