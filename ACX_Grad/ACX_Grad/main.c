@@ -23,21 +23,7 @@ int main(void)
    volatile int j = 0;
    x_init();
    x_new(0, thread0Blink, true);  // create thread, ID=1
-// x_new(0, testThread, true);  // replace current thread
 
-	/*
-   DDRB = 0x80;
-   PORTB |= 0x80;
-   DDRF |= (1<<DDF1)|(1<<DDF0);
-   x_init();
-   setTimer();
-   x_new(0, thread0Blink, true); 
-   x_new(1, thread1Blink, true);  
-   PORTF |= 0x03;
-   while(1) {
-	      
-   }
-   */
    while(1){
 	 j++;
 	 x_yield();
