@@ -22,7 +22,7 @@ int main(void)
 {
    volatile int j = 0;
    x_init();
-   x_new(1, thread0Blink, true);  // create thread, ID=1
+   x_new(0, thread0Blink, true);  // create thread, ID=1
 // x_new(0, testThread, true);  // replace current thread
 
 	/*

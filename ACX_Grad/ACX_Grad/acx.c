@@ -62,6 +62,7 @@ void kernalInit(void) {
 
     x_thread_id = 0; // current thread
     x_thread_mask = 0x01;
+	setTimer();
 }
 
 //---------------------------------------------------
@@ -125,8 +126,9 @@ void x_delay(unsigned int time) {
 	delay |= bit2mask8(x_thread_id); 
 	
 	// initiate thread rescheduling
-	x_yield(); 
 	sei();
+	x_yield(); 
+	
 	// return to caller.
 }
 
@@ -143,7 +145,7 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
 	//x_thread_id = ID;
-	//x_thread_mask |= bit2mask8(ID);
+	x_thread_mask |= bit2mask8(ID);
 	volatile PTUnion ret;
 
 	ret.addr[2] = 0;

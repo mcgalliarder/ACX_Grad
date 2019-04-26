@@ -123,6 +123,12 @@ x_schedule:
 	or r21, r19
 
 scan_begin:
+	lds r19, disable
+	lds r20, suspend
+	lds r21, delay
+
+	or r21, r20
+	or r21, r19
 	subi r18, -1			; get next thhread
 	andi r18, 0x07			; mod by numthreads
 
