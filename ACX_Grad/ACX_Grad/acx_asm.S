@@ -137,6 +137,7 @@ scan_begin:
 
 	; Retrieve next stack pointer for next thread
     ;---------------------------
+	sts x_thread_id, r18  ; should set x_thread_id to currently running thread
 	mov r30, r18        ; get stack ID
  	ldi r31, 0
 
@@ -213,12 +214,4 @@ again:
 done:	mov r24, r25
 		ldi r25, 0
 		ret
-/*
-		jmp finished
 
-none:
-		ldi r25, 0
-		ldi r24, 0	
-finished:
-		ret
-*/

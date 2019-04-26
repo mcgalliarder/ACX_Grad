@@ -2,7 +2,7 @@
  * acx.c
  *
  * Created: 3/26/2019 12:34:55 PM
- *  Author: Andrew Thorp
+ * Author: Andrew Thorp thorpah
  * Author: Eli McGalliard mcgalliarder
  *
  *       **************************************************
@@ -30,14 +30,14 @@
 #include <stdbool.h>
 #include "acx.h"
 
-
 byte disable;
 byte suspend;
 byte delay;
-unsigned int delayCounters[MAX_DELAY];
+byte mem[STACK_MEM_SIZE];
 byte x_thread_id;
 byte x_thread_mask;
-byte mem[STACK_MEM_SIZE];
+volatile uint16_t x_thread_delay[MAXTHREADS]; //Each thread has a max_delay counter
+unsigned long x_gTime = 0;
 
 stackControl stackControlTable [MAXTHREADS] = {{T0_STACK_BASE_OFFS + (int) mem, T0_STACK_BASE_OFFS+ (int) mem},
 											   {T1_STACK_BASE_OFFS + (int) mem, T1_STACK_BASE_OFFS+ (int) mem},
@@ -58,7 +58,7 @@ void kernalInit(void) {
 
     for (int i = 0; i < MAXTHREADS; i++)
         // no delays
-        delayCounters[i] = 0; 
+        x_thread_delay[i] = 0; 
 
     x_thread_id = 0; // current thread
     x_thread_mask = 0x01;
@@ -78,39 +78,11 @@ void placeCanaries(void) {
     mem[T7_CANARY_OFFS] = CANARY;
 }
 
-//---------------------------------------------------
-// Stack Memory
-//---------------------------------------------------
-
-//---------------------------------------------------
-// Thread Delay Counters
-//---------------------------------------------------
-
-
-//---------------------------------------------------
-// Exec State Variables
-//---------------------------------------------------
-
-
-
-//---------------------------------------------------
-// Local Functions
-//---------------------------------------------------
-
-
-//---------------------------------------------------
-// ACX Functions
-//---------------------------------------------------
-//
-// defined in acx_asm.S
-// void x_yield(void)
-// void x_schedule(void)
 
 void x_init(void)
 {
 	// Save the stack pointer as a byte pointer
 	byte * stackP = (byte *) SP;
-	
 	
 	asm("cli");
 
@@ -118,8 +90,6 @@ void x_init(void)
     kernalInit();
     // place canary values
     placeCanaries();
-
-    // Save the stack pointer as a byte pointer
 
     // create a PTUnion and save the return address
     volatile PTUnion ret;
@@ -137,35 +107,28 @@ void x_init(void)
 	mem[stackpointer--] = ret.addr[0];
 	SP = SP - 10;
 	
-
-
-	
 	asm("sei");
-
 	// return to caller.
 }
 
 void x_delay(unsigned int time) {
+	if (time > MAX_DELAY) time = MAX_DELAY;
+	if (time < 0) time = 0; // shouldn't ever happen
 	cli();
-
-	// Your initialization code here
-
+    
+	// copy delay value into calling thread's counter
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		x_thread_delay[x_thread_id] = time;	
+	}
+	
+	// set x_delay_status bit corresponding to thread's id 
+	delay |= bit2mask8(x_thread_id); 
+	
+	// initiate thread rescheduling
+	x_yield(); 
 	sei();
-
 	// return to caller.
 }
-
-unsigned long x_gtime() {
-	cli();
-
-	// Your initialization code here
-
-	sei();
-
-	// return to caller.
-	return 1L;
-}
-
 
 /*
  * x_new initializes a new thread in the system
@@ -179,17 +142,24 @@ unsigned long x_gtime() {
 void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	cli();
 	//volatile PTUnion ret = {*thread};
+	//x_thread_id = ID;
+	//x_thread_mask |= bit2mask8(ID);
 	volatile PTUnion ret;
+
 	ret.addr[2] = 0;
 	ret.addr[1] = 0;
 	ret.addr[0] = 0;
+
 	ret.pthread = thread;
 	
 	int stackpointer = stackControlTable[ID].spBase - (int) mem;
 	
-	mem[stackpointer--] = ret.addr[2];
-	mem[stackpointer--] = ret.addr[1];
+	// since the int is stored in Little Endian,
+	// you have to reverse it here so the return address
+	// is big endian in memory.
 	mem[stackpointer--] = ret.addr[0];
+	mem[stackpointer--] = ret.addr[1];
+	mem[stackpointer--] = ret.addr[2];
 	
 	stackControlTable[ID].sp = stackControlTable[ID].spBase - 22; //18
 	
@@ -201,11 +171,19 @@ void x_new(uint8_t ID, PTHREAD thread, bool enable) {
 	// return to caller.
 }
 
+unsigned long x_gtime() {
+	
+	return x_gTime;
+
+}
+
 void x_suspend(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		suspend |= bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -215,7 +193,9 @@ void x_resume(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		suspend &= ~bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -225,7 +205,9 @@ void x_disable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		disable |= bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -235,7 +217,9 @@ void x_enable(uint8_t ID) {
 	cli();
 
 	// Your initialization code here
-
+	ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+		disable &= ~bit2mask8(ID);
+	}
 	sei();
 
 	// return to caller.
@@ -267,3 +251,57 @@ void x_stack_overflow(void) {
 	}
 }
 
+void setTimer() {
+	PRR0 = 0x00;
+	TCNT1 = 0;
+
+	// period 333.33 ms @ 16144, on-time = 75 ms @ 4688
+	int TOP1 = 63; // OFFTIME - 1 ms
+	int TOP2 = 63;//63;// ONTIME - 1 ms
+
+	cli();
+	TCCR1A = 0x00;
+	TCCR1B = 0x00;
+	//TCCR0A = 0x02; //Sets CTC mode of operation?
+
+	// configure match register
+	ICR1 = TOP1;
+	OCR1A = TOP2;    // 75 msec
+	TCCR1B = 0x04;   // clk/256 from prescaler
+
+	// turn on CTC mode:
+	TCCR1B |= (1 << WGM12);
+
+	// Set CS10 and CS12 bits for 1024 prescaler:
+	TCCR1B |= (1 << CS10);
+	TCCR1B |= (1 << CS12);
+
+	// enable timer compare interrupt:
+	TIMSK1 |= (1 << OCIE1A);
+	sei();          // enable global interrupts
+}
+
+ISR(TIMER1_COMPA_vect){
+	
+	x_gTime++;
+	
+	//check x_delay_thread for every thread
+	for(int i = 0; i < MAXTHREADS; i++) {
+		
+		// check if thread is currently delayed
+		int delayStatus = bit2mask8(i) & delay; 
+		
+		//if the delay status is not zero and the count isn't zero
+		if (x_thread_delay[i] && delayStatus) { 
+			
+			// decrement threads count
+			ATOMIC_BLOCK(ATOMIC_RESTORESTATE) {
+				x_thread_delay[i]--;
+			}
+			
+			//if counter is now zero then clear delay bit
+			if (!x_thread_delay[i])
+				delay &= ~(bit2mask8(i));
+		}
+	}
+}
